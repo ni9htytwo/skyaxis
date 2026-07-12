@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkyAxis 天域枢 · 产品演示 · 新能源场站</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#061527; --bg2:#081D36; --panel:#0B2440; --panel2:#0E2D52;
+  --line:#1B3A5C; --line-hi:rgba(79,195,247,.45);
+  --ink:#EAF3FA; --dim:#93B4CE; --faint:#5E7F9C;
+  --blue:#4FC3F7; --blue2:#1B76C8; --amber:#FFB020; --red:#FF5A5A; --green:#3DDC97;
+  --sans:'Noto Sans SC',-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:'IBM Plex Mono','Noto Sans SC',monospace;
+  --serif:'Noto Serif SC',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:13px;line-height:1.6;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:#1B3A5C;border-radius:4px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ============ TOP BAR ============ */
+.topbar{
+  height:52px;flex:0 0 52px;display:flex;align-items:center;gap:14px;
+  padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--line);z-index:30;
+}
+.logo{display:flex;align-items:baseline;gap:8px;white-space:nowrap}
+.logo b{font-family:var(--serif);font-size:15px;font-weight:700;letter-spacing:.02em}
+.logo span{font-family:var(--mono);font-size:8.5px;color:var(--faint);letter-spacing:.2em}
+.site-chip{
+  display:flex;align-items:center;gap:8px;font-size:12px;color:var(--dim);
+  border:1px solid var(--line);border-radius:4px;padding:4px 10px;white-space:nowrap;
+}
+.site-chip .livedot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:blink 1.6s infinite}
+@keyframes blink{50%{opacity:.35}}
+.view-tabs{display:flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;margin:0 auto}
+.view-tabs button{
+  font-size:12px;padding:6px 16px;color:var(--dim);transition:all .2s;white-space:nowrap;
+  border-right:1px solid var(--line);
+}
+.view-tabs button:last-child{border-right:none}
+.view-tabs button[aria-pressed="true"]{background:var(--blue2);color:#fff}
+.drill-btn{
+  font-size:12px;font-weight:500;color:var(--amber);border:1px solid rgba(255,176,32,.5);
+  border-radius:4px;padding:5px 14px;white-space:nowrap;transition:all .2s;
+}
+.drill-btn:hover:not(:disabled){background:rgba(255,176,32,.12)}
+.drill-btn:disabled{opacity:.4;cursor:default}
+.top-meta{display:flex;align-items:center;gap:14px;font-family:var(--mono);font-size:11px;color:var(--faint);white-space:nowrap}
+.top-meta b{color:var(--dim);font-weight:500}
+.op-badge{
+  width:28px;height:28px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--blue);
+}
+
+/* ============ MAIN LAYOUT ============ */
+.main{flex:1;display:flex;min-height:0}
+.col-left{width:236px;flex:0 0 236px;background:var(--bg2);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.col-center{flex:1;display:flex;flex-direction:column;min-width:0;position:relative}
+.col-right{width:300px;flex:0 0 300px;background:var(--bg2);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+
+.panel-head{
+  flex:0 0 auto;font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;color:var(--faint);
+  text-transform:uppercase;padding:12px 14px 10px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:8px;
+}
+.panel-head .count{margin-left:auto;color:var(--blue);letter-spacing:.05em}
+
+/* roster */
+.roster-filters{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.rf{
+  font-size:11px;color:var(--dim);border:1px solid var(--line);border-radius:100px;
+  padding:2px 10px;transition:all .15s;
+}
+.rf[data-on="1"]{color:var(--ink);border-color:var(--line-hi);background:rgba(79,195,247,.08)}
+.rf[data-on="0"]{opacity:.45}
+.roster{flex:1;overflow-y:auto;padding:8px}
+.r-group{font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:var(--faint);padding:8px 6px 4px}
+.r-item{
+  width:100%;display:flex;align-items:center;gap:9px;text-align:left;
+  padding:8px 8px;border-radius:5px;border:1px solid transparent;transition:all .15s;
+}
+.r-item:hover{background:rgba(27,118,200,.1)}
+.r-item.sel{border-color:var(--line-hi);background:rgba(27,118,200,.14)}
+.r-ic{width:22px;height:22px;flex:0 0 22px;display:flex;align-items:center;justify-content:center}
+.r-ic svg{width:18px;height:18px;stroke:var(--blue);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.r-info{flex:1;min-width:0}
+.r-name{font-size:12px;color:var(--ink);display:flex;gap:6px;align-items:baseline}
+.r-name .rid{font-family:var(--mono);font-size:9px;color:var(--faint)}
+.r-task{font-size:10.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.r-batt{width:34px;flex:0 0 34px;text-align:right}
+.r-batt .bb{height:3px;border-radius:2px;background:var(--line);overflow:hidden;margin-top:3px}
+.r-batt .bf{height:100%;background:var(--green);transition:width .5s}
+.r-batt .bt{font-family:var(--mono);font-size:9px;color:var(--faint)}
+.r-batt.low .bf{background:var(--amber)}
+.r-batt.crit .bf{background:var(--red)}
+.r-status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex:0 0 6px}
+.r-status-dot.warn{background:var(--amber)}
+.r-status-dot.chg{background:var(--blue)}
+
+/* KPI strip */
+.kpis{
+  flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:var(--line);border-bottom:1px solid var(--line);
+}
+.kpi{background:var(--bg2);padding:8px 14px}
+.kpi b{font-family:var(--mono);font-size:17px;font-weight:500;color:var(--blue);display:block;line-height:1.3}
+.kpi b.warn{color:var(--amber)}
+.kpi span{font-size:10px;color:var(--faint);letter-spacing:.04em}
+
+/* ============ MAP ============ */
+.map-wrap{flex:1;position:relative;min-height:0;background:#07182C;overflow:hidden}
+.map-wrap.targeting{cursor:crosshair}
+.map-wrap svg.site{display:block;width:100%;height:100%}
+.zone-label{font-family:var(--mono);font-size:11px;fill:#5E7F9C;letter-spacing:2px}
+.ent{cursor:pointer}
+.ent text{font-family:var(--mono);font-size:9px;fill:#5E7F9C;letter-spacing:1px}
+.ent .sel-ring{opacity:0}
+.ent.sel .sel-ring{opacity:1}
+.map-banner{
+  position:absolute;top:0;left:0;right:0;z-index:6;
+  background:linear-gradient(90deg,rgba(255,176,32,.16),rgba(255,90,90,.1));
+  border-bottom:1px solid rgba(255,176,32,.5);
+  padding:7px 16px;font-size:12px;color:var(--amber);
+  display:none;align-items:center;gap:10px;
+}
+.map-banner.show{display:flex}
+.map-banner .mono{font-family:var(--mono);font-size:10.5px;margin-left:auto;color:rgba(255,176,32,.8)}
+.replay-banner{
+  position:absolute;top:0;left:0;right:0;z-index:6;
+  background:rgba(27,118,200,.14);border-bottom:1px solid var(--line-hi);
+  padding:7px 16px;font-size:12px;color:var(--blue);display:none;align-items:center;gap:10px;
+}
+.replay-banner.show{display:flex}
+.hint-chip{
+  position:absolute;left:50%;transform:translateX(-50%);bottom:14px;z-index:6;
+  background:rgba(8,23,42,.92);border:1px solid var(--line-hi);border-radius:100px;
+  padding:6px 18px;font-size:12px;color:var(--dim);display:none;align-items:center;gap:12px;
+}
+.hint-chip.show{display:flex}
+.hint-chip button{color:var(--faint);font-size:11px;border-left:1px solid var(--line);padding-left:12px}
+.hint-chip button:hover{color:var(--ink)}
+
+/* entity detail card */
+.detail{
+  position:absolute;left:14px;bottom:14px;z-index:7;width:238px;
+  background:rgba(8,23,42,.95);border:1px solid var(--line-hi);border-radius:6px;
+  padding:13px 14px;display:none;box-shadow:0 14px 40px rgba(0,0,0,.5);
+}
+.detail.show{display:block}
+.detail h4{font-size:13.5px;font-weight:500;display:flex;align-items:baseline;gap:8px}
+.detail h4 .rid{font-family:var(--mono);font-size:9.5px;color:var(--faint)}
+.detail .d-close{position:absolute;top:8px;right:10px;color:var(--faint);font-size:14px;line-height:1}
+.detail .d-close:hover{color:var(--ink)}
+.d-rows{margin:9px 0 11px;font-size:11.5px;color:var(--dim);display:grid;gap:3px}
+.d-rows .lab{color:var(--faint);display:inline-block;width:52px}
+.d-rows .mono{font-family:var(--mono);font-size:10.5px}
+.d-actions{display:flex;gap:7px;flex-wrap:wrap}
+.d-btn{
+  font-size:11.5px;padding:5px 11px;border-radius:4px;border:1px solid var(--line);
+  color:var(--dim);transition:all .15s;
+}
+.d-btn:hover{border-color:var(--line-hi);color:var(--ink)}
+.d-btn.primary{background:var(--blue2);border-color:var(--blue2);color:#fff}
+.d-btn.primary:hover{background:#2585d8}
+.d-btn[aria-pressed="true"]{background:rgba(79,195,247,.15);border-color:var(--line-hi);color:var(--blue)}
+
+/* drone HUD */
+.hud{position:absolute;inset:0;z-index:5;pointer-events:none;display:none}
+.hud.show{display:block}
+.hud .corner{position:absolute;width:34px;height:34px;border:2px solid rgba(79,195,247,.55)}
+.hud .c1{top:14px;left:14px;border-right:none;border-bottom:none}
+.hud .c2{top:14px;right:14px;border-left:none;border-bottom:none}
+.hud .c3{bottom:14px;left:14px;border-right:none;border-top:none}
+.hud .c4{bottom:14px;right:14px;border-left:none;border-top:none}
+.hud .cross{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:rgba(79,195,247,.8);font-family:var(--mono);font-size:18px}
+.hud .h-left,.hud .h-right{
+  position:absolute;top:50%;transform:translateY(-50%);
+  font-family:var(--mono);font-size:10.5px;color:var(--blue);letter-spacing:.1em;line-height:2.1;
+}
+.hud .h-left{left:22px}
+.hud .h-right{right:22px;text-align:right}
+.hud .h-top{
+  position:absolute;top:44px;left:0;right:0;text-align:center;
+  font-family:var(--mono);font-size:10.5px;color:var(--blue);letter-spacing:.24em;
+}
+.hud .rec{color:var(--red);animation:blink 1.2s infinite}
+.hud .vig{position:absolute;inset:0;box-shadow:inset 0 0 120px rgba(4,12,24,.9)}
+
+/* phone overlay */
+.phone-layer{position:absolute;inset:0;z-index:8;background:rgba(4,12,24,.55);display:none;align-items:center;justify-content:center}
+.phone-layer.show{display:flex}
+.phone{
+  width:300px;height:560px;max-height:92%;background:#0A1E38;border:1px solid var(--line-hi);
+  border-radius:26px;padding:12px;display:flex;flex-direction:column;
+  box-shadow:0 30px 80px rgba(0,0,0,.6);
+}
+.phone-notch{width:90px;height:5px;border-radius:3px;background:var(--line);margin:2px auto 10px}
+.phone-head{display:flex;align-items:baseline;gap:8px;padding:0 6px 10px;border-bottom:1px solid var(--line)}
+.phone-head b{font-size:13px}
+.phone-head span{font-family:var(--mono);font-size:9px;color:var(--faint);letter-spacing:.1em}
+.phone-head .x{margin-left:auto;color:var(--faint);font-size:15px}
+.phone-body{flex:1;overflow-y:auto;padding:10px 4px}
+.p-sec{font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:var(--faint);margin:10px 4px 6px}
+.p-map{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#07182C}
+.p-map svg{display:block;width:100%}
+.p-task{
+  display:flex;gap:9px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);
+  border-radius:7px;margin-bottom:7px;font-size:12px;color:var(--dim);
+  cursor:pointer;transition:all .15s;text-align:left;width:100%;
+}
+.p-task:hover{border-color:var(--line-hi)}
+.p-task .cb{
+  width:15px;height:15px;flex:0 0 15px;border:1.5px solid var(--faint);border-radius:4px;margin-top:2px;
+  display:flex;align-items:center;justify-content:center;font-size:10px;color:#07182C;
+}
+.p-task.done{opacity:.55}
+.p-task.done .cb{background:var(--green);border-color:var(--green)}
+.p-task.dispatch{border-color:rgba(255,176,32,.55);color:var(--amber)}
+.p-report{
+  width:100%;margin-top:8px;font-size:12.5px;font-weight:500;color:#fff;
+  background:var(--blue2);border-radius:7px;padding:10px;transition:background .2s;
+}
+.p-report:hover{background:#2585d8}
+.phone-note{font-size:10px;color:var(--faint);text-align:center;padding:8px 4px 2px}
+
+/* ============ RIGHT PANEL ============ */
+.rtabs{display:flex;border-bottom:1px solid var(--line);flex:0 0 auto}
+.rtabs button{
+  flex:1;font-size:12px;padding:10px 4px;color:var(--dim);border-bottom:2px solid transparent;transition:all .2s;
+  position:relative;
+}
+.rtabs button[aria-pressed="true"]{color:var(--blue);border-bottom-color:var(--blue)}
+.rtabs .dot{
+  position:absolute;top:8px;right:14px;width:6px;height:6px;border-radius:50%;
+  background:var(--amber);display:none;
+}
+.rtabs .dot.show{display:block;animation:blink 1.2s infinite}
+.rpane{flex:1;overflow-y:auto;display:none;min-height:0}
+.rpane.show{display:block}
+
+/* event feed */
+.feed{padding:10px 14px}
+.ev{
+  font-family:var(--mono);font-size:10.5px;line-height:1.7;color:var(--dim);
+  padding:6px 0;border-bottom:1px solid rgba(27,58,92,.5);
+  opacity:0;transform:translateX(-6px);animation:evin .3s forwards;
+}
+@keyframes evin{to{opacity:1;transform:none}}
+.ev .t{color:var(--faint);margin-right:7px}
+.ev.warn{color:var(--amber)}
+.ev.ok{color:var(--green)}
+.ev.sys{color:var(--blue)}
+
+/* workflow */
+.wf{padding:14px}
+.wf-empty{color:var(--faint);font-size:12px;padding:20px 6px;text-align:center;line-height:2}
+.wf-alert{
+  border:1px solid rgba(255,176,32,.5);border-radius:6px;background:rgba(255,176,32,.07);
+  padding:12px;margin-bottom:14px;
+}
+.wf-alert h5{font-size:13px;color:var(--amber);display:flex;gap:8px;align-items:center}
+.wf-alert .meta{font-family:var(--mono);font-size:10px;color:rgba(255,176,32,.75);margin-top:4px;line-height:1.8}
+.wf-timer{font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-bottom:12px}
+.wf-timer b{color:var(--amber);font-weight:500}
+.wf-step{margin-bottom:6px;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.wf-step .s-head{
+  display:flex;align-items:center;gap:9px;padding:9px 12px;font-size:12px;color:var(--faint);
+}
+.wf-step .s-num{
+  width:18px;height:18px;flex:0 0 18px;border-radius:50%;border:1px solid var(--line);
+  font-family:var(--mono);font-size:9px;display:flex;align-items:center;justify-content:center;
+}
+.wf-step.active{border-color:var(--line-hi)}
+.wf-step.active .s-head{color:var(--ink)}
+.wf-step.active .s-num{border-color:var(--blue);color:var(--blue)}
+.wf-step.done .s-head{color:var(--green)}
+.wf-step.done .s-num{border-color:var(--green);color:var(--green)}
+.wf-step .s-body{display:none;padding:2px 12px 12px;font-size:11.5px;color:var(--dim)}
+.wf-step.active .s-body{display:block}
+.wf-btn{
+  width:100%;margin-top:9px;font-size:12px;font-weight:500;color:#fff;background:var(--blue2);
+  border-radius:5px;padding:8px;transition:all .2s;
+}
+.wf-btn:hover:not(:disabled){background:#2585d8}
+.wf-btn:disabled{opacity:.4;cursor:default}
+.wf-btn.amber{background:#B87C12}
+.wf-btn.amber:hover:not(:disabled){background:#d3921a}
+.unit-opt{
+  display:flex;align-items:center;gap:9px;padding:7px 9px;border:1px solid var(--line);
+  border-radius:5px;margin-top:6px;cursor:pointer;transition:all .15s;width:100%;text-align:left;
+}
+.unit-opt:hover{border-color:var(--line-hi)}
+.unit-opt.on{border-color:var(--blue);background:rgba(79,195,247,.09)}
+.unit-opt .cb{width:13px;height:13px;flex:0 0 13px;border:1.5px solid var(--faint);border-radius:3px}
+.unit-opt.on .cb{background:var(--blue);border-color:var(--blue)}
+.unit-opt .u-n{font-size:11.5px;color:var(--ink)}
+.unit-opt .u-d{font-family:var(--mono);font-size:9.5px;color:var(--faint);margin-left:auto;white-space:nowrap}
+.unit-live{font-family:var(--mono);font-size:10px;color:var(--dim);line-height:2;margin-top:4px}
+.unit-live .st-en{color:var(--amber)}
+.unit-live .st-ar{color:var(--green)}
+
+/* resources */
+.res{padding:12px 14px}
+.res h6{font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:var(--faint);margin:10px 0 8px;text-transform:uppercase}
+.chg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.chg{
+  border:1px solid var(--line);border-radius:5px;padding:8px 6px;text-align:center;
+  font-family:var(--mono);font-size:9px;color:var(--faint);
+}
+.chg b{display:block;font-size:10px;font-weight:500;color:var(--dim);margin-top:3px}
+.chg.busy{border-color:var(--line-hi)}
+.chg.busy b{color:var(--blue)}
+.res-item{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid rgba(27,58,92,.5)}
+.res-item .rn{font-size:11.5px;color:var(--dim);width:110px;flex:0 0 110px}
+.res-item .rn small{display:block;font-family:var(--mono);font-size:9px;color:var(--faint)}
+.res-item .bar{flex:1;height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.res-item .fill{height:100%;background:var(--green);transition:width .5s}
+.res-item.low .fill{background:var(--amber)}
+.res-item.crit .fill{background:var(--red)}
+.res-item .pv{font-family:var(--mono);font-size:10px;color:var(--dim);width:56px;text-align:right;flex:0 0 56px}
+.res-note{font-size:10.5px;color:var(--faint);margin-top:10px;line-height:1.8}
+
+/* ============ BOTTOM BAR ============ */
+.botbar{
+  flex:0 0 44px;display:flex;align-items:center;gap:16px;padding:0 16px;
+  background:var(--bg2);border-top:1px solid var(--line);z-index:30;
+}
+.live-tag{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;color:var(--green);letter-spacing:.12em}
+.live-tag .livedot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 7px var(--green);animation:blink 1.6s infinite}
+.live-tag.off{color:var(--faint)}
+.live-tag.off .livedot{background:var(--faint);box-shadow:none;animation:none}
+.replay-ctl{flex:1;display:flex;align-items:center;gap:12px;min-width:0}
+.rp-btn{
+  font-size:11.5px;color:var(--dim);border:1px solid var(--line);border-radius:4px;
+  padding:4px 13px;transition:all .15s;white-space:nowrap;
+}
+.rp-btn:hover:not(:disabled){border-color:var(--line-hi);color:var(--ink)}
+.rp-btn:disabled{opacity:.4;cursor:default}
+.rp-btn.on{background:var(--blue2);border-color:var(--blue2);color:#fff}
+.rp-slider{flex:1;display:none;align-items:center;gap:10px;min-width:0}
+.rp-slider.show{display:flex}
+.rp-slider input[type=range]{flex:1;accent-color:var(--blue);min-width:0}
+.rp-time{font-family:var(--mono);font-size:10px;color:var(--blue);white-space:nowrap;letter-spacing:.05em}
+.priv-tag{font-family:var(--mono);font-size:9.5px;color:var(--faint);letter-spacing:.1em;white-space:nowrap;display:flex;align-items:center;gap:7px}
+.priv-tag svg{width:13px;height:13px;stroke:var(--faint);fill:none;stroke-width:1.5}
+
+/* toasts */
+.toasts{position:fixed;bottom:56px;left:50%;transform:translateX(-50%);z-index:60;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{
+  background:rgba(8,23,42,.95);border:1px solid var(--line-hi);border-radius:6px;
+  padding:8px 18px;font-size:12px;color:var(--ink);box-shadow:0 10px 30px rgba(0,0,0,.5);
+  animation:toastin .25s ease, toastout .3s ease 2.7s forwards;
+}
+@keyframes toastin{from{opacity:0;transform:translateY(8px)}}
+@keyframes toastout{to{opacity:0;transform:translateY(-6px)}}
+
+/* onboarding */
+.onboard{
+  position:fixed;inset:0;z-index:80;background:rgba(4,12,24,.72);backdrop-filter:blur(3px);
+  display:flex;align-items:center;justify-content:center;
+}
+.onboard.hide{display:none}
+.ob-card{
+  width:430px;max-width:92vw;background:var(--bg2);border:1px solid var(--line-hi);border-radius:10px;
+  padding:30px 32px;box-shadow:0 30px 90px rgba(0,0,0,.6);
+}
+.ob-card .eyebrow{font-family:var(--mono);font-size:9.5px;letter-spacing:.28em;color:var(--blue);margin-bottom:12px}
+.ob-card h3{font-family:var(--serif);font-size:21px;font-weight:700;margin-bottom:16px}
+.ob-card li{
+  list-style:none;display:flex;gap:12px;font-size:13px;color:var(--dim);
+  padding:8px 0;line-height:1.7;
+}
+.ob-card li b{color:var(--ink);font-weight:500}
+.ob-card li .n{
+  font-family:var(--mono);font-size:10px;color:var(--blue);border:1px solid var(--line-hi);
+  width:20px;height:20px;flex:0 0 20px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:3px;
+}
+.ob-start{
+  width:100%;margin-top:18px;font-size:13.5px;font-weight:500;color:#fff;background:var(--blue2);
+  border-radius:6px;padding:12px;transition:background .2s;
+}
+.ob-start:hover{background:#2585d8}
+.ob-sub{text-align:center;font-size:10.5px;color:var(--faint);margin-top:10px}
+
+.narrow-note{display:none}
+@media (max-width:1080px){
+  .col-left{width:200px;flex-basis:200px}
+  .col-right{width:264px;flex-basis:264px}
+}
+@media (max-width:880px){
+  .main,.botbar,.topbar{display:none}
+  .narrow-note{
+    display:flex;flex:1;align-items:center;justify-content:center;text-align:center;
+    padding:40px;color:var(--dim);font-size:14px;line-height:2.2;
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .livedot,.rtabs .dot,.hud .rec{animation:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ ONBOARDING ============ -->
+<div class="onboard" id="onboard">
+  <div class="ob-card">
+    <div class="eyebrow">SkyAxis 天域枢 · 产品演示</div>
+    <h3>某 100MW 光伏场站 · 值班台</h3>
+    <ul>
+      <li><span class="n">1</span><div><b>点选任意主体</b>（图上或左侧名单）查看状态，可下达移动指令、开启跟踪。</div></li>
+      <li><span class="n">2</span><div>点顶部 <b>「模拟异常事件」</b>，在右侧「处置」页走完一次完整的定位 → 派单 → 处置 → 归档流程。</div></li>
+      <li><span class="n">3</span><div>切换<b>无人机视角 / 移动巡检端</b>看多视角联动；处置结束后用底部<b>「回放」</b>拖动时间轴复盘。</div></li>
+    </ul>
+    <button class="ob-start" id="obStart">开始体验</button>
+    <div class="ob-sub">演示数据为模拟生成 · 私有化部署形态，数据不出场站</div>
+  </div>
+</div>
+
+<!-- ============ TOP BAR ============ -->
+<header class="topbar">
+  <div class="logo"><b>SkyAxis 天域枢</b><span>OPS CONSOLE</span></div>
+  <div class="site-chip"><span class="livedot"></span>某 100MW 光伏场站<span style="color:var(--faint)">·</span><span style="font-family:var(--mono);font-size:10px">晴 26°C 西南风3级 适飞</span></div>
+  <div class="view-tabs" role="tablist" aria-label="视角切换">
+    <button id="vMain" aria-pressed="true">态势大屏</button>
+    <button id="vDrone" aria-pressed="false">无人机视角</button>
+    <button id="vMobile" aria-pressed="false">移动巡检端</button>
+  </div>
+  <button class="drill-btn" id="drillBtn">⚠ 模拟异常事件</button>
+  <div class="top-meta"><span id="topClock">--:--:--</span></div>
+  <div class="op-badge" title="值班主管 · 张工">张</div>
+</header>
+
+<!-- ============ MAIN ============ -->
+<div class="main">
+
+  <!-- LEFT: roster -->
+  <aside class="col-left">
+    <div class="panel-head">在图主体<span class="count" id="rosterCount">9</span></div>
+    <div class="roster-filters" id="rosterFilters">
+      <button class="rf" data-type="person" data-on="1">人员</button>
+      <button class="rf" data-type="vehicle" data-on="1">车辆</button>
+      <button class="rf" data-type="robot" data-on="1">机器人</button>
+      <button class="rf" data-type="drone" data-on="1">无人机</button>
+    </div>
+    <div class="roster" id="roster"></div>
+  </aside>
+
+  <!-- CENTER: map -->
+  <div class="col-center">
+    <div class="kpis">
+      <div class="kpi"><b id="kEnt">9</b><span>在图主体</span></div>
+      <div class="kpi"><b id="kTask">17<span style="font-size:11px;color:var(--faint)">/24</span></b><span>今日巡检任务</span></div>
+      <div class="kpi"><b id="kAlert">0</b><span>未处置告警</span></div>
+      <div class="kpi"><b id="kResp">1'42"</b><span>今日平均响应</span></div>
+    </div>
+    <div class="map-wrap" id="mapWrap">
+      <div class="map-banner" id="alertBanner">
+        <span>⚠</span><b id="abText">升压站 2# 主变温度异常</b>
+        <span>· 前往右侧「处置」页处理</span>
+        <span class="mono" id="abTimer">00:00</span>
+      </div>
+      <div class="replay-banner" id="replayBanner"><span>◉</span><b>回放模式</b><span>· 正在查看历史轨迹，实时监控在后台继续</span></div>
+
+      <svg class="site" id="siteMap" viewBox="0 0 1200 680" role="img" aria-label="场站实时态势图">
+        <defs>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M40 0H0V40" fill="none" stroke="#10294A" stroke-width="0.7"/>
+          </pattern>
+          <radialGradient id="alertGlow"><stop offset="0%" stop-color="#FFB020" stop-opacity=".5"/><stop offset="100%" stop-color="#FFB020" stop-opacity="0"/></radialGradient>
+        </defs>
+        <rect width="1200" height="680" fill="url(#grid)"/>
+
+        <!-- zones -->
+        <g font-family="'IBM Plex Mono',monospace">
+          <rect x="40" y="50" width="380" height="200" rx="4" fill="rgba(27,118,200,.05)" stroke="#1B3A5C"/>
+          <text class="zone-label" x="56" y="76">光伏阵列 A 区</text>
+          <g stroke="#16406B" stroke-width="6" opacity=".7">
+            <line x1="66" y1="104" x2="396" y2="104"/><line x1="66" y1="136" x2="396" y2="136"/>
+            <line x1="66" y1="168" x2="396" y2="168"/><line x1="66" y1="200" x2="396" y2="200"/><line x1="66" y1="228" x2="396" y2="228"/>
+          </g>
+          <rect x="40" y="300" width="380" height="200" rx="4" fill="rgba(27,118,200,.05)" stroke="#1B3A5C"/>
+          <text class="zone-label" x="56" y="326">光伏阵列 B 区</text>
+          <g stroke="#16406B" stroke-width="6" opacity=".7">
+            <line x1="66" y1="354" x2="396" y2="354"/><line x1="66" y1="386" x2="396" y2="386"/>
+            <line x1="66" y1="418" x2="396" y2="418"/><line x1="66" y1="450" x2="396" y2="450"/><line x1="66" y1="478" x2="396" y2="478"/>
+          </g>
+          <rect x="40" y="548" width="380" height="100" rx="4" fill="rgba(27,118,200,.04)" stroke="#1B3A5C"/>
+          <text class="zone-label" x="56" y="574">逆变器室 · 集电线路</text>
+          <g fill="none" stroke="#23507F"><rect x="70" y="590" width="44" height="38"/><rect x="130" y="590" width="44" height="38"/><rect x="190" y="590" width="44" height="38"/><rect x="250" y="590" width="44" height="38"/></g>
+
+          <rect x="620" y="60" width="260" height="190" rx="4" fill="rgba(255,176,32,.04)" stroke="#1B3A5C"/>
+          <text class="zone-label" x="636" y="86">升压站</text>
+          <rect x="660" y="110" width="52" height="80" fill="none" stroke="#23507F"/>
+          <text x="686" y="208" text-anchor="middle" font-size="9" fill="#5E7F9C">1# 主变</text>
+          <rect x="760" y="110" width="52" height="80" fill="none" stroke="#23507F"/>
+          <text x="786" y="208" text-anchor="middle" font-size="9" fill="#5E7F9C">2# 主变</text>
+
+          <rect x="620" y="380" width="280" height="160" rx="4" fill="rgba(27,118,200,.05)" stroke="#1B3A5C"/>
+          <text class="zone-label" x="636" y="406">储能区</text>
+          <g fill="none" stroke="#23507F"><rect x="648" y="426" width="40" height="66"/><rect x="704" y="426" width="40" height="66"/><rect x="760" y="426" width="40" height="66"/><rect x="816" y="426" width="40" height="66"/></g>
+
+          <rect x="960" y="60" width="200" height="140" rx="4" fill="rgba(61,220,151,.04)" stroke="#1B3A5C"/>
+          <text class="zone-label" x="976" y="86">机库 · 充电区</text>
+          <g id="chgSlots" font-size="8"></g>
+
+          <rect x="980" y="420" width="180" height="180" rx="4" fill="rgba(27,118,200,.05)" stroke="#1B3A5C"/>
+          <text class="zone-label" x="996" y="446">值班楼 · 集控室</text>
+          <rect x="1010" y="470" width="120" height="90" fill="none" stroke="#23507F"/>
+        </g>
+
+        <!-- roads -->
+        <g stroke="#1B3A5C" stroke-width="16" stroke-linecap="round" fill="none" opacity=".55">
+          <path d="M480 30 V650"/><path d="M480 300 H1170"/><path d="M930 60 V600"/>
+        </g>
+        <g stroke="#2C578A" stroke-width="1" stroke-dasharray="8 10" fill="none" opacity=".6">
+          <path d="M480 30 V650"/><path d="M480 300 H1170"/><path d="M930 60 V600"/>
+        </g>
+
+        <!-- command target marker -->
+        <g id="cmdMark" opacity="0" pointer-events="none">
+          <circle r="10" fill="none" stroke="#4FC3F7" stroke-width="1.6"/>
+          <path d="M0 -15 V-7 M0 15 V7 M-15 0 H-7 M15 0 H7" stroke="#4FC3F7" stroke-width="1.6"/>
+        </g>
+        <path id="cmdLine" stroke="#4FC3F7" stroke-width="1.3" stroke-dasharray="5 6" fill="none" opacity="0"/>
+
+        <!-- alert -->
+        <g id="alertG" opacity="0" pointer-events="none">
+          <circle r="52" fill="url(#alertGlow)"/>
+          <circle id="alertRing" r="13" fill="none" stroke="#FFB020" stroke-width="2"/>
+          <path d="M0 -6 V2 M0 6.5 V6.6" stroke="#FFB020" stroke-width="2.6" stroke-linecap="round"/>
+          <text y="-26" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="11" fill="#FFB020" letter-spacing="2">2# 主变 · 温度异常</text>
+        </g>
+        <g id="dispatchLines" stroke="#FFB020" stroke-width="1.4" stroke-dasharray="5 6" fill="none" opacity="0"></g>
+
+        <g id="entities"></g>
+      </svg>
+
+      <!-- drone HUD -->
+      <div class="hud" id="hud">
+        <div class="vig"></div>
+        <div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
+        <div class="cross">+</div>
+        <div class="h-top"><span class="rec">●</span>&nbsp;REC&nbsp;&nbsp;D-01 · SKYEYE&nbsp;&nbsp;4K/30</div>
+        <div class="h-left">ALT&nbsp;60.0 m<br>SPD&nbsp;<span id="hudSpd">8.4</span> m/s<br>GPS&nbsp;RTK FIX</div>
+        <div class="h-right">BAT&nbsp;<span id="hudBat">78</span>%<br>LINK&nbsp;-52 dBm<br>MODE&nbsp;巡航</div>
+      </div>
+
+      <!-- phone -->
+      <div class="phone-layer" id="phoneLayer">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-head"><b>移动巡检端</b><span>P-01 · 王</span><button class="x" id="phoneClose" aria-label="关闭">✕</button></div>
+          <div class="phone-body">
+            <div class="p-sec">我的位置 · 与大屏同一份数据</div>
+            <div class="p-map"><svg id="miniMap" viewBox="0 0 1200 680">
+              <rect width="1200" height="680" fill="#07182C"/>
+              <g fill="rgba(27,118,200,.08)" stroke="#1B3A5C">
+                <rect x="40" y="50" width="380" height="200" rx="4"/><rect x="40" y="300" width="380" height="200" rx="4"/>
+                <rect x="40" y="548" width="380" height="100" rx="4"/><rect x="620" y="60" width="260" height="190" rx="4"/>
+                <rect x="620" y="380" width="280" height="160" rx="4"/><rect x="960" y="60" width="200" height="140" rx="4"/>
+                <rect x="980" y="420" width="180" height="180" rx="4"/>
+              </g>
+              <g stroke="#1B3A5C" stroke-width="16" opacity=".5" fill="none"><path d="M480 30 V650"/><path d="M480 300 H1170"/><path d="M930 60 V600"/></g>
+              <circle id="miniMe" r="12" fill="#4FC3F7"/>
+              <circle id="miniMePulse" r="12" fill="none" stroke="#4FC3F7" stroke-width="2" opacity=".5"/>
+            </svg></div>
+            <div class="p-sec">今日任务 · 光伏 A 区</div>
+            <div id="pTasks"></div>
+            <button class="p-report" id="pReport">上报现场情况</button>
+            <div class="phone-note">同一坐标系 · 上报即刻出现在大屏事件流</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hint-chip" id="hintChip"><span id="hintText"></span><button id="hintCancel">取消 (Esc)</button></div>
+
+      <!-- entity detail -->
+      <div class="detail" id="detail">
+        <button class="d-close" id="dClose" aria-label="关闭">✕</button>
+        <h4><span id="dName">—</span><span class="rid" id="dId"></span></h4>
+        <div class="d-rows">
+          <div><span class="lab">当前任务</span><span id="dTask">—</span></div>
+          <div><span class="lab">状态</span><span id="dStatus">—</span></div>
+          <div><span class="lab">坐标</span><span class="mono" id="dPos">—</span></div>
+          <div id="dBattRow"><span class="lab">电量</span><span class="mono" id="dBatt">—</span></div>
+        </div>
+        <div class="d-actions">
+          <button class="d-btn primary" id="dMove">移动指令</button>
+          <button class="d-btn" id="dFollow" aria-pressed="false">跟踪</button>
+          <button class="d-btn" id="dCall">呼叫</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: tabs -->
+  <aside class="col-right">
+    <div class="rtabs" role="tablist">
+      <button id="tFeed" aria-pressed="true">事件流</button>
+      <button id="tWf" aria-pressed="false">处置<span class="dot" id="wfDot"></span></button>
+      <button id="tRes" aria-pressed="false">资源</button>
+    </div>
+    <div class="rpane feed show" id="paneFeed"></div>
+    <div class="rpane" id="paneWf"><div class="wf" id="wfBox"><div class="wf-empty">当前无待处置事件<br><span style="font-size:11px">点击顶部「模拟异常事件」体验完整处置流程</span></div></div></div>
+    <div class="rpane" id="paneRes"><div class="res" id="resBox"></div></div>
+  </aside>
+</div>
+
+<!-- ============ BOTTOM BAR ============ -->
+<footer class="botbar">
+  <div class="live-tag" id="liveTag"><span class="livedot"></span><span id="liveTxt">LIVE</span></div>
+  <div class="replay-ctl">
+    <button class="rp-btn" id="rpToggle">◉ 进入回放</button>
+    <div class="rp-slider" id="rpSlider">
+      <span class="rp-time" id="rpFrom">-3:00</span>
+      <input type="range" id="rpRange" min="0" max="100" value="100" aria-label="回放时间轴">
+      <span class="rp-time" id="rpAt">现在</span>
+    </div>
+  </div>
+  <div class="priv-tag"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8.2-7 9.5-4-1.3-7-5-7-9.5V6l7-3z"/><path d="M9 11.5l2 2 4-4"/></svg>私有化部署 · 数据不出场站</div>
+</footer>
+
+<div class="toasts" id="toasts"></div>
+<div class="narrow-note">此产品演示为指挥大屏 / 桌面工作台形态，请在宽度 ≥ 880px 的屏幕上打开。<br>移动巡检端形态已内置于演示中（顶部视角切换）。</div>
+
+<script>
+(function(){
+'use strict';
+var reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var SVGNS='http://www.w3.org/2000/svg';
+function el(tag,attrs){var n=document.createElementNS(SVGNS,tag);for(var k in attrs)n.setAttribute(k,attrs[k]);return n;}
+function $(id){return document.getElementById(id)}
+function pad(n){return n<10?'0'+n:''+n}
+function fmt(d){return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())}
+
+/* ================= STATE ================= */
+var CHARGER={x:1060,y:150};
+var HANGAR={x:1000,y:130};
+var ALERT_POS={x:786,y:150};
+var state={
+  view:'main',          // main | drone | mobile
+  mode:'live',          // live | replay
+  vb:{x:0,y:0,w:1200,h:680},
+  vbT:{x:0,y:0,w:1200,h:680},
+  selected:null, follow:null, targeting:false,
+  incident:null,        // {stage,t0,units:[],chosen:Set,confirmedAt}
+  history:[], histTimer:0,
+  tasksDone:17, alerts:0,
+};
+
+/* ================= ENTITIES ================= */
+var entities=[
+  {id:'P-01',type:'person',name:'巡检员 · 王',task:'A 区例行巡检 3/6',speed:24,batt:null,
+   pts:[[80,120],[380,120],[380,215],[80,215]]},
+  {id:'P-02',type:'person',name:'值班员 · 李',task:'升压站例行点检',speed:21,batt:null,
+   pts:[[700,230],[840,230],[840,100],[700,100]]},
+  {id:'P-03',type:'person',name:'巡检员 · 赵',task:'B 区例行巡检 4/6',speed:22,batt:null,
+   pts:[[80,370],[380,370],[380,465],[80,465]]},
+  {id:'P-04',type:'person',name:'安全员 · 陈',task:'储能区安全巡查',speed:19,batt:null,
+   pts:[[650,520],[870,520],[870,405],[650,405]]},
+  {id:'V-01',type:'vehicle',name:'维护皮卡 01',task:'备件运送 · 在途',speed:62,batt:null,
+   pts:[[480,60],[480,295],[700,295],[925,295],[925,120],[925,295],[700,295],[480,295],[480,620],[480,60]]},
+  {id:'V-02',type:'vehicle',name:'消防巡逻车',task:'厂区环线巡逻',speed:52,batt:null,
+   pts:[[494,620],[494,312],[930,312],[930,590],[930,312],[494,312],[494,620]]},
+  {id:'R-01',type:'robot',name:'巡检机器人 A3',task:'A 区红外测温',speed:15,batt:82,drain:.06,
+   pts:[[60,90],[400,90],[400,238],[60,238],[60,90]]},
+  {id:'R-02',type:'robot',name:'巡检机器人 B1',task:'B 区表计读数',speed:14,batt:27,drain:.14,
+   pts:[[60,340],[400,340],[400,488],[60,488],[60,340]]},
+  {id:'D-01',type:'drone',name:'无人机 SkyEye-1',task:'2 号航线巡检',speed:92,batt:78,drain:.05,
+   pts:[[230,90],[820,120],[880,470],[300,520],[140,300],[230,90]]}
+];
+var TYPE_LABEL={person:'人员',vehicle:'车辆',robot:'机器人',drone:'无人机'};
+var ICONS={
+  person:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M6 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/></svg>',
+  vehicle:'<svg viewBox="0 0 24 24"><rect x="3" y="10" width="14" height="7" rx="1.5"/><path d="M17 12h3.5v5H17"/><circle cx="7.5" cy="18.5" r="1.6"/><circle cx="16" cy="18.5" r="1.6"/></svg>',
+  robot:'<svg viewBox="0 0 24 24"><rect x="7" y="10" width="10" height="9" rx="2"/><path d="M12 10V5.5"/><circle cx="12" cy="4.5" r="1.3"/><circle cx="10" cy="14" r=".8"/><circle cx="14" cy="14" r=".8"/></svg>',
+  drone:'<svg viewBox="0 0 24 24"><path d="M5 5l5 5M19 5l-5 5M5 19l5-5M19 19l-5-5"/><circle cx="12" cy="12" r="2.4"/><circle cx="5" cy="5" r="1.6"/><circle cx="19" cy="5" r="1.6"/><circle cx="5" cy="19" r="1.6"/><circle cx="19" cy="19" r="1.6"/></svg>'
+};
+
+/* build map glyphs */
+var entLayer=$('entities');
+entities.forEach(function(en){
+  var g=el('g',{'class':'ent','data-type':en.type});
+  g.appendChild(el('circle',{r:15,fill:'transparent'}));            // hit area
+  var ring=el('circle',{'class':'sel-ring',r:13,fill:'none',stroke:'#4FC3F7','stroke-width':'1.4','stroke-dasharray':'3 4'});
+  g.appendChild(ring);
+  if(en.type==='person'){
+    g.appendChild(el('circle',{r:5.5,fill:'#4FC3F7'}));
+    g.appendChild(el('circle',{r:9,fill:'none',stroke:'#4FC3F7','stroke-opacity':'.35'}));
+  }else if(en.type==='vehicle'){
+    g.appendChild(el('rect',{x:-8,y:-5,width:16,height:10,rx:2,fill:'#8AB4F8'}));
+  }else if(en.type==='robot'){
+    g.appendChild(el('rect',{x:-6,y:-6,width:12,height:12,rx:2,fill:'none',stroke:'#4FC3F7','stroke-width':'1.8'}));
+    g.appendChild(el('line',{x1:0,y1:-6,x2:0,y2:-11,stroke:'#4FC3F7','stroke-width':'1.4'}));
+    g.appendChild(el('circle',{cy:-12.5,r:1.6,fill:'#4FC3F7'}));
+  }else{
+    g.appendChild(el('path',{d:'M-7 -7 L7 7 M7 -7 L-7 7',stroke:'#3DDC97','stroke-width':'2','stroke-linecap':'round'}));
+    g.appendChild(el('circle',{r:3,fill:'#3DDC97'}));
+  }
+  var t=el('text',{y:-18,'text-anchor':'middle'});t.textContent=en.id;g.appendChild(t);
+  entLayer.appendChild(g);
+  en.g=g; en.seg=0; en.t=Math.random()*.8; en.x=en.pts[0][0]; en.y=en.pts[0][1];
+  en.mission=null; en.status='normal'; en.charging=false; en.visible=true;
+  g.addEventListener('click',function(ev){ev.stopPropagation();if(state.mode==='replay')return;if(state.targeting){issueMove(pointFromEvent(ev));return;}select(en);});
+});
+
+/* charger slots on map */
+var chgSlots=$('chgSlots');
+var SLOT_POS=[[1000,130],[1042,130],[1084,130],[1126,130]];
+SLOT_POS.forEach(function(p,i){
+  var r=el('rect',{x:p[0]-13,y:p[1]-13,width:26,height:26,rx:3,fill:'none',stroke:'#23507F','stroke-width':'1.2','data-slot':i});
+  chgSlots.appendChild(r);
+  var t=el('text',{x:p[0],y:p[1]+28,'text-anchor':'middle',fill:'#5E7F9C','font-size':'8'});t.textContent='C'+(i+1);
+  chgSlots.appendChild(t);
+});
+
+/* ================= ROSTER ================= */
+var roster=$('roster');
+function battClass(b){return b==null?'':(b<15?'crit':(b<30?'low':''))}
+function buildRoster(){
+  roster.innerHTML='';
+  ['person','vehicle','robot','drone'].forEach(function(tp){
+    var grp=document.createElement('div');grp.className='r-group';grp.textContent=TYPE_LABEL[tp];
+    roster.appendChild(grp);
+    entities.filter(function(e){return e.type===tp}).forEach(function(en){
+      var b=document.createElement('button');
+      b.className='r-item';b.dataset.id=en.id;
+      b.innerHTML='<span class="r-ic">'+ICONS[tp]+'</span>'
+        +'<span class="r-info"><span class="r-name">'+en.name+'<span class="rid">'+en.id+'</span></span>'
+        +'<span class="r-task"></span></span>'
+        +(en.batt!=null?'<span class="r-batt"><span class="bt"></span><span class="bb"><span class="bf"></span></span></span>':'<span class="r-status-dot"></span>');
+      b.addEventListener('click',function(){if(state.mode!=='replay')select(en)});
+      roster.appendChild(b);
+      en.rEl=b;
+    });
+  });
+}
+buildRoster();
+function refreshRoster(){
+  entities.forEach(function(en){
+    var b=en.rEl;
+    b.classList.toggle('sel',state.selected===en);
+    b.style.display=en.visible?'':'none';
+    b.querySelector('.r-task').textContent=statusText(en);
+    if(en.batt!=null){
+      var w=b.querySelector('.r-batt');
+      w.className='r-batt '+battClass(en.batt);
+      w.querySelector('.bt').textContent=Math.round(en.batt)+'%';
+      w.querySelector('.bf').style.width=en.batt+'%';
+    }else{
+      var d=b.querySelector('.r-status-dot');
+      d.className='r-status-dot'+(en.status==='respond'?' warn':'');
+    }
+  });
+  $('rosterCount').textContent=entities.filter(function(e){return e.visible}).length;
+  $('kEnt').textContent=entities.filter(function(e){return e.visible}).length;
+}
+function statusText(en){
+  if(en.status==='respond')return en.mission&&en.mission.arrived?'⚠ 异常点处置中':'⚠ 应急前往中';
+  if(en.status==='moveCmd')return '执行移动指令';
+  if(en.status==='toCharge')return '低电量 · 返航充电';
+  if(en.charging)return '充电中 '+Math.round(en.batt)+'%';
+  return en.task;
+}
+
+/* filters */
+document.querySelectorAll('.rf').forEach(function(f){
+  f.addEventListener('click',function(){
+    var on=f.dataset.on==='1'?'0':'1';f.dataset.on=on;
+    entities.forEach(function(en){
+      if(en.type===f.dataset.type){en.visible=(on==='1');en.g.style.display=en.visible?'':'none';
+        if(!en.visible&&state.selected===en)deselect();}
+    });
+    refreshRoster();
+  });
+});
+
+/* ================= EVENTS FEED ================= */
+var feed=$('paneFeed');
+function log(msg,cls){
+  var d=new Date();
+  var e=document.createElement('div');e.className='ev'+(cls?' '+cls:'');
+  e.innerHTML='<span class="t">'+fmt(d)+'</span>'+msg;
+  feed.prepend(e);
+  while(feed.children.length>60)feed.removeChild(feed.lastChild);
+}
+log('SkyAxis 平台已连接 · 9 个主体在图','sys');
+log('日间值班班次进行中 · 值班主管：张工');
+var ambient=[
+  ['R-01 完成 A 区第 3 排红外测温 · 无异常',null,'task'],
+  ['D-01 航线巡检覆盖率 41% · 影像回传正常',null,null],
+  ['P-03 完成 B 区第 4 排组串点检',null,'task'],
+  ['V-01 抵达升压站西侧 · 备件交付','ok',null],
+  ['P-04 储能区巡查签到 · 舱温正常',null,null],
+  ['R-02 表计读数上传 · 16 条',null,null],
+  ['V-02 环线巡逻 · 周界正常',null,null],
+  ['P-02 升压站 1# 主变点检完成',null,'task']
+];
+var ai=0;
+setInterval(function(){
+  if(state.mode!=='live')return;
+  var a=ambient[ai%ambient.length];ai++;
+  log(a[0],a[1]);
+  if(a[2]==='task'&&state.tasksDone<24){state.tasksDone++;$('kTask').innerHTML=state.tasksDone+'<span style="font-size:11px;color:var(--faint)">/24</span>';}
+},11000);
+
+/* ================= SIM LOOP ================= */
+function segLen(a,b){return Math.hypot(b[0]-a[0],b[1]-a[1])||1}
+function nearestSeg(en){var bi=0,bd=1e9;en.pts.forEach(function(p,i){var d=Math.hypot(p[0]-en.x,p[1]-en.y);if(d<bd){bd=d;bi=i}});return bi}
+var last=null;
+function frame(ts){
+  if(last===null)last=ts;
+  var dt=Math.min((ts-last)/1000,.05);last=ts;
+
+  if(state.mode==='live'){
+    entities.forEach(function(en){
+      /* battery */
+      if(en.batt!=null&&!en.charging&&en.status!=='toCharge')en.batt=Math.max(0,en.batt-en.drain*dt*(en.mission?1.6:1));
+      if(en.charging){en.batt=Math.min(100,en.batt+1.4*dt);
+        if(en.batt>=95){en.charging=false;en.seg=nearestSeg(en);en.t=0;
+          log(en.id+' 充电完成（95%）· 返回巡检任务','ok');refreshResources();}
+      }
+      /* low battery → auto return to charge (not while responding to incident) */
+      if(en.batt!=null&&en.batt<20&&!en.charging&&en.status!=='toCharge'&&en.status!=='respond'){
+        en.status='toCharge';
+        var slot=en.type==='drone'?HANGAR:CHARGER;
+        en.mission={x:slot.x,y:slot.y,kind:'charge',onArrive:function(){
+          en.mission=null;en.status='normal';en.charging=true;
+          log(en.id+' 已入位充电 · 电量 '+Math.round(en.batt)+'%','sys');refreshResources();
+        }};
+        log('⚠ '+en.id+' 电量低（'+Math.round(en.batt)+'%）· 自动返航充电','warn');
+        refreshResources();
+      }
+      /* motion */
+      if(en.mission){
+        var dx=en.mission.x-en.x,dy=en.mission.y-en.y,d=Math.hypot(dx,dy);
+        var sp=en.speed*2.1;
+        if(d<3){if(!en.mission.arrived){en.mission.arrived=true;if(en.mission.onArrive)en.mission.onArrive();}}
+        else{en.x+=dx/d*sp*dt;en.y+=dy/d*sp*dt;}
+      }else if(!en.charging){
+        var a=en.pts[en.seg],b=en.pts[(en.seg+1)%en.pts.length];
+        en.t+=(en.speed*dt)/segLen(a,b);
+        if(en.t>=1){en.t=0;en.seg=(en.seg+1)%en.pts.length;a=en.pts[en.seg];b=en.pts[(en.seg+1)%en.pts.length];}
+        en.x=a[0]+(b[0]-a[0])*en.t;en.y=a[1]+(b[1]-a[1])*en.t;
+      }
+      en.g.setAttribute('transform','translate('+en.x+','+en.y+')');
+    });
+    /* record history every 500ms */
+    state.histTimer+=dt;
+    if(state.histTimer>=.5){
+      state.histTimer=0;
+      state.history.push({t:Date.now(),pos:entities.map(function(e){return [e.x,e.y]}),alert:!!state.incident});
+      if(state.history.length>360)state.history.shift();
+    }
+  }
+
+  /* camera */
+  var tgt=state.vbT;
+  if(state.view==='drone'){var d1=byId('D-01');tgt={x:d1.x-250,y:d1.y-145,w:500,h:290};}
+  else if(state.follow&&state.mode==='live'){var f=state.follow;tgt={x:f.x-320,y:f.y-185,w:640,h:370};}
+  else tgt={x:0,y:0,w:1200,h:680};
+  ['x','y','w','h'].forEach(function(k){state.vb[k]+= (tgt[k]-state.vb[k])*Math.min(1,dt*4);});
+  var vb=state.vb;
+  vb.x=Math.max(-40,Math.min(vb.x,1240-vb.w));vb.y=Math.max(-40,Math.min(vb.y,720-vb.h));
+  siteMap.setAttribute('viewBox',vb.x+' '+vb.y+' '+vb.w+' '+vb.h);
+
+  /* dispatch lines */
+  updDispatch();
+  /* selected card live fields */
+  if(state.selected&&state.mode==='live')updDetailLive();
+  /* HUD */
+  if(state.view==='drone'){var dr=byId('D-01');$('hudBat').textContent=Math.round(dr.batt);$('hudSpd').textContent=(dr.mission?9.6:8.4).toFixed(1);}
+  /* mini map */
+  if(state.view==='mobile'){var p1=byId('P-01');
+    $('miniMe').setAttribute('cx',p1.x);$('miniMe').setAttribute('cy',p1.y);
+    $('miniMePulse').setAttribute('cx',p1.x);$('miniMePulse').setAttribute('cy',p1.y);}
+  requestAnimationFrame(frame);
+}
+var siteMap=$('siteMap');
+function byId(id){return entities.find(function(e){return e.id===id})}
+requestAnimationFrame(frame);
+setInterval(refreshRoster,700);
+
+/* clock */
+function tick(){$('topClock').textContent=fmt(new Date());
+  if(state.incident&&state.incident.t0&&!state.incident.closed){
+    var s=Math.floor((Date.now()-state.incident.t0)/1000);
+    $('abTimer').textContent=pad(Math.floor(s/60))+':'+pad(s%60);
+    var tm=$('wfTimer');if(tm)tm.innerHTML='事件响应计时 <b>'+pad(Math.floor(s/60))+':'+pad(s%60)+'</b>';
+  }}
+tick();setInterval(tick,1000);
+
+/* ================= SELECTION / COMMANDS ================= */
+var detail=$('detail');
+/* overlays sit inside mapWrap — keep their clicks from reaching the map handler */
+detail.addEventListener('click',function(ev){ev.stopPropagation()});
+$('hintChip').addEventListener('click',function(ev){ev.stopPropagation()});
+function select(en){
+  if(state.selected)state.selected.g.classList.remove('sel');
+  state.selected=en;en.g.classList.add('sel');
+  $('dName').textContent=en.name;$('dId').textContent=en.id;
+  $('dBattRow').style.display=en.batt!=null?'':'none';
+  $('dFollow').setAttribute('aria-pressed',state.follow===en?'true':'false');
+  $('dMove').style.display=(en.type==='person')?'none':'';   // people get called, machines get commanded
+  detail.classList.add('show');
+  updDetailLive();refreshRoster();
+}
+function updDetailLive(){
+  var en=state.selected;if(!en)return;
+  $('dTask').textContent=statusText(en);
+  $('dStatus').textContent=en.status==='respond'?'应急响应':(en.charging?'充电中':en.status==='toCharge'?'返航充电':en.status==='moveCmd'?'执行指令':'正常作业');
+  $('dPos').textContent='X '+Math.round(en.x)+' · Y '+Math.round(en.y);
+  if(en.batt!=null)$('dBatt').textContent=Math.round(en.batt)+'%';
+}
+function deselect(){
+  if(state.selected)state.selected.g.classList.remove('sel');
+  state.selected=null;detail.classList.remove('show');refreshRoster();
+}
+$('dClose').addEventListener('click',deselect);
+$('dCall').addEventListener('click',function(){
+  toast('已接通 '+state.selected.id+' 语音通道（模拟）');
+  log('值班台呼叫 '+state.selected.id+' · 语音通道接通','sys');
+});
+$('dFollow').addEventListener('click',function(){
+  if(state.follow===state.selected){state.follow=null;this.setAttribute('aria-pressed','false');}
+  else{state.follow=state.selected;this.setAttribute('aria-pressed','true');toast('镜头跟踪 '+state.selected.id+' · Esc 退出');}
+});
+$('dMove').addEventListener('click',function(){
+  state.targeting=true;
+  $('mapWrap').classList.add('targeting');
+  showHint('移动指令 · 点击图上目标位置，'+state.selected.id+' 将前往');
+});
+function showHint(txt){$('hintText').textContent=txt;$('hintChip').classList.add('show');}
+function hideHint(){$('hintChip').classList.remove('show');}
+$('hintCancel').addEventListener('click',cancelTargeting);
+function cancelTargeting(){state.targeting=false;$('mapWrap').classList.remove('targeting');hideHint();}
+function pointFromEvent(ev){
+  var pt=siteMap.createSVGPoint();pt.x=ev.clientX;pt.y=ev.clientY;
+  var p=pt.matrixTransform(siteMap.getScreenCTM().inverse());
+  return {x:Math.max(20,Math.min(1180,p.x)), y:Math.max(20,Math.min(660,p.y))};
+}
+var cmdMark=$('cmdMark'),cmdLine=$('cmdLine');
+function issueMove(p){
+  var en=state.selected;if(!en)return cancelTargeting();
+  cancelTargeting();
+  cmdMark.setAttribute('transform','translate('+p.x+','+p.y+')');cmdMark.setAttribute('opacity','1');
+  en.status='moveCmd';
+  en.mission={x:p.x,y:p.y,kind:'move',onArrive:function(){
+    log(en.id+' 已抵达指令位置 X '+Math.round(p.x)+' · Y '+Math.round(p.y),'ok');
+    toast(en.id+' 已抵达指令位置');
+    setTimeout(function(){
+      if(en.status!=='moveCmd')return;
+      en.mission=null;en.status='normal';en.seg=nearestSeg(en);en.t=0;
+      cmdMark.setAttribute('opacity','0');cmdLine.setAttribute('opacity','0');
+      log(en.id+' 恢复原巡检任务');
+    },2500);
+  }};
+  log('值班台向 '+en.id+' 下达移动指令 → X '+Math.round(p.x)+' · Y '+Math.round(p.y),'sys');
+  toast('指令已下达 · '+en.id+' 前往目标位置');
+}
+$('mapWrap').addEventListener('click',function(ev){
+  if(state.mode==='replay')return;
+  if(state.targeting){issueMove(pointFromEvent(ev));return;}
+  deselect();
+});
+document.addEventListener('keydown',function(ev){
+  if(ev.key==='Escape'){cancelTargeting();if(state.follow){state.follow=null;$('dFollow').setAttribute('aria-pressed','false');}}
+});
+/* command line render */
+setInterval(function(){
+  var en=state.selected;
+  var any=entities.find(function(e){return e.status==='moveCmd'&&e.mission});
+  if(any&&any.mission){cmdLine.setAttribute('d','M'+any.x+' '+any.y+' L'+any.mission.x+' '+any.mission.y);cmdLine.setAttribute('opacity',any.mission.arrived?'0':'.7');}
+  else cmdLine.setAttribute('opacity','0');
+},80);
+
+/* ================= RIGHT TABS ================= */
+function showTab(which){
+  [['tFeed','paneFeed'],['tWf','paneWf'],['tRes','paneRes']].forEach(function(p){
+    $(p[0]).setAttribute('aria-pressed',p[0]===which?'true':'false');
+    $(p[1]).classList.toggle('show',p[0]===which);
+  });
+  if(which==='tWf')$('wfDot').classList.remove('show');
+}
+$('tFeed').addEventListener('click',function(){showTab('tFeed')});
+$('tWf').addEventListener('click',function(){showTab('tWf')});
+$('tRes').addEventListener('click',function(){showTab('tRes')});
+
+/* ================= RESOURCES ================= */
+function refreshResources(){
+  var box=$('resBox');
+  var chargers=SLOT_POS.map(function(p,i){
+    var occ=entities.find(function(e){return e.charging&&Math.hypot(e.x-(e.type==='drone'?HANGAR.x:CHARGER.x),e.y-(e.type==='drone'?HANGAR.y:CHARGER.y))<30&&i===0});
+    return occ;
+  });
+  /* simple: slot C1 = whoever charging (robot), C2 = drone if charging */
+  var charging=entities.filter(function(e){return e.charging});
+  var html='<h6>充电桩 · 机库</h6><div class="chg-grid">';
+  for(var i=0;i<4;i++){
+    var who=charging[i];
+    html+='<div class="chg'+(who?' busy':'')+'">C'+(i+1)+'<b>'+(who?who.id:'空闲')+'</b></div>';
+  }
+  html+='</div><h6>机器电量与状态</h6>';
+  entities.filter(function(e){return e.batt!=null}).forEach(function(e){
+    var st=e.charging?'充电中':(e.status==='toCharge'?'返航充电':(e.status==='respond'?'应急响应':'作业中'));
+    html+='<div class="res-item '+battClass(e.batt)+'"><span class="rn">'+e.name+'<small>'+e.id+' · '+st+'</small></span>'
+      +'<span class="bar"><span class="fill" style="width:'+e.batt+'%"></span></span>'
+      +'<span class="pv">'+Math.round(e.batt)+'%</span></div>';
+  });
+  html+='<h6>今日架次 / 里程</h6>'
+    +'<div class="res-item"><span class="rn">无人机架次<small>D-01</small></span><span class="pv" style="width:auto;flex:1;text-align:right">3 架次 · 26.4 km</span></div>'
+    +'<div class="res-item"><span class="rn">机器人里程<small>R-01 / R-02</small></span><span class="pv" style="width:auto;flex:1;text-align:right">11.8 km</span></div>'
+    +'<div class="res-note">电量低于 20% 时自动返航充电并在事件流留痕；应急响应任务优先于返航。</div>';
+  box.innerHTML=html;
+}
+refreshResources();
+setInterval(refreshResources,3000);
+
+/* ================= INCIDENT WORKFLOW ================= */
+var alertG=$('alertG'),dispatchG=$('dispatchLines');
+alertG.setAttribute('transform','translate('+ALERT_POS.x+','+ALERT_POS.y+')');
+var ringTimer=null;
+function updDispatch(){
+  dispatchG.innerHTML='';
+  if(!state.incident||!state.incident.units.length){dispatchG.setAttribute('opacity','0');return;}
+  dispatchG.setAttribute('opacity','.8');
+  state.incident.units.forEach(function(en){
+    if(en.mission&&!en.mission.arrived)dispatchG.appendChild(el('line',{x1:en.x,y1:en.y,x2:ALERT_POS.x,y2:ALERT_POS.y}));
+  });
+}
+$('drillBtn').addEventListener('click',function(){
+  if(state.incident)return;
+  startIncident();
+});
+function startIncident(){
+  state.incident={stage:1,t0:Date.now(),units:[],chosen:{},closed:false};
+  state.alerts=1;$('kAlert').textContent='1';$('kAlert').className='warn';
+  $('drillBtn').disabled=true;
+  $('alertBanner').classList.add('show');
+  alertG.setAttribute('opacity','1');
+  if(!reduced){var t0=performance.now();
+    ringTimer=setInterval(function(){var p=((performance.now()-t0)%1600)/1600;
+      $('alertRing').setAttribute('r',13+p*34);$('alertRing').setAttribute('stroke-opacity',1-p);},40);}
+  log('⚠ 升压站 2# 主变 A 相温度 96.2°C · 超限报警','warn');
+  $('wfDot').classList.add('show');
+  renderWf();showTab('tWf');
+  $('rpToggle').disabled=true;
+}
+function wfStepHtml(n,title,active,done,body){
+  return '<div class="wf-step'+(active?' active':'')+(done?' done':'')+'">'
+    +'<div class="s-head"><span class="s-num">'+(done?'✓':n)+'</span>'+title+'</div>'
+    +'<div class="s-body">'+(body||'')+'</div></div>';
+}
+function candidateUnits(){
+  return entities.filter(function(e){
+      return ['P-02','P-04','D-01','R-01','V-01'].indexOf(e.id)>=0
+        && e.visible && !e.charging && e.status!=='toCharge';
+    })
+    .map(function(e){var d=Math.hypot(e.x-ALERT_POS.x,e.y-ALERT_POS.y);
+      return {en:e,d:d,eta:Math.round(d/(e.speed*2.1))};})
+    .sort(function(a,b){return a.d-b.d});
+}
+function renderWf(){
+  var inc=state.incident,box=$('wfBox');
+  if(!inc){box.innerHTML='<div class="wf-empty">当前无待处置事件<br><span style="font-size:11px">点击顶部「模拟异常事件」体验完整处置流程</span></div>';return;}
+  var html='<div class="wf-alert"><h5><span>⚠</span>升压站 2# 主变温度异常</h5>'
+    +'<div class="meta">A 相绕组 96.2°C（限值 85°C）<br>位置 X 786 · Y 150 · 置信度 高（双测点一致）</div></div>'
+    +'<div class="wf-timer" id="wfTimer">事件响应计时 <b>00:00</b></div>';
+
+  /* step 1 */
+  html+=wfStepHtml(1,'确认报警并定位',inc.stage===1,inc.stage>1,
+    '报警点已在图上高亮。确认后进入响应单元选择。'
+    +'<button class="wf-btn amber" id="wf1">确认报警 · 图上定位</button>');
+  /* step 2 */
+  var s2='';
+  if(inc.stage===2){
+    s2='按直线距离就近推荐，可多选：';
+    candidateUnits().forEach(function(c){
+      var on=inc.chosen[c.en.id];
+      s2+='<button class="unit-opt'+(on?' on':'')+'" data-u="'+c.en.id+'"><span class="cb"></span>'
+        +'<span class="u-n">'+c.en.name+'</span><span class="u-d">'+Math.round(c.d)+' m · 约 '+c.eta+'s</span></button>';
+    });
+    s2+='<button class="wf-btn" id="wf2" '+(Object.keys(inc.chosen).length?'':'disabled')+'>派出所选单元（'+Object.keys(inc.chosen).length+'）</button>';
+  }
+  html+=wfStepHtml(2,'选择并派出响应单元',inc.stage===2,inc.stage>2,s2);
+  /* step 3 */
+  var s3='';
+  if(inc.stage===3){
+    s3='<div class="unit-live">';
+    inc.units.forEach(function(en){
+      var ar=en.mission&&en.mission.arrived;
+      s3+=en.id+' '+en.name+' · <span class="'+(ar?'st-ar':'st-en')+'">'+(ar?'已抵达':'在途')+'</span><br>';
+    });
+    s3+='</div>';
+    var allArr=inc.units.every(function(e){return e.mission&&e.mission.arrived});
+    s3+='<button class="wf-btn" id="wf3" '+(allArr?'':'disabled')+'>'+(allArr?'现场确认：散热风机故障 · 已隔离':'等待单元抵达…')+'</button>';
+  }
+  html+=wfStepHtml(3,'现场处置与确认',inc.stage===3,inc.stage>3,s3);
+  /* step 4 */
+  var s4='';
+  if(inc.stage===4){
+    var secs=Math.floor((inc.confirmedAt-inc.t0)/1000);
+    s4='处置确认完成。响应用时 <b style="color:var(--green)">'+pad(Math.floor(secs/60))+':'+pad(secs%60)+'</b>，全过程已留痕，可在关闭后进入回放复盘。'
+      +'<button class="wf-btn" id="wf4">关闭事件并归档</button>';
+  }
+  html+=wfStepHtml(4,'关闭事件 · 归档复盘',inc.stage===4,inc.stage>4,s4);
+  box.innerHTML=html;
+
+  var b1=$('wf1');if(b1)b1.addEventListener('click',function(){
+    inc.stage=2;log('值班台确认报警 · 事件 EV-0712-03 建立','sys');renderWf();
+  });
+  box.querySelectorAll('.unit-opt').forEach(function(u){
+    u.addEventListener('click',function(){
+      var id=u.dataset.u;
+      if(inc.chosen[id])delete inc.chosen[id];else inc.chosen[id]=true;
+      renderWf();
+    });
+  });
+  var b2=$('wf2');if(b2)b2.addEventListener('click',function(){
+    var ids=Object.keys(inc.chosen);
+    inc.units=ids.map(byId);
+    inc.units.forEach(function(en){
+      en.status='respond';
+      var off=en.type==='drone'?{x:24,y:-16}:{x:-26,y:18};
+      en.mission={x:ALERT_POS.x+off.x+Math.random()*10,y:ALERT_POS.y+off.y+Math.random()*10,kind:'respond',
+        onArrive:function(){log(en.id+' 抵达异常点 · 开始处置','sys');renderWf();}};
+    });
+    log('派单 → '+ids.join(' · ')+' 前往升压站异常点','sys');
+    toast('已派出 '+ids.length+' 个响应单元');
+    inc.stage=3;renderWf();
+  });
+  var b3=$('wf3');if(b3&&!b3.disabled)b3.addEventListener('click',function(){
+    inc.confirmedAt=Date.now();
+    log('现场确认：2# 主变散热风机故障 · 已隔离并切换备用','ok');
+    inc.stage=4;renderWf();
+  });
+  var b4=$('wf4');if(b4)b4.addEventListener('click',closeIncident);
+}
+/* refresh workflow arrival states */
+setInterval(function(){
+  var inc=state.incident;
+  if(inc&&inc.stage===3){
+    var b3=$('wf3');var allArr=inc.units.every(function(e){return e.mission&&e.mission.arrived});
+    if(b3&&b3.disabled&&allArr)renderWf();
+    var live=document.querySelector('.unit-live');
+    if(live){var s='';inc.units.forEach(function(en){var ar=en.mission&&en.mission.arrived;
+      s+=en.id+' '+en.name+' · <span class="'+(ar?'st-ar':'st-en')+'">'+(ar?'已抵达':'在途')+'</span><br>';});
+    live.innerHTML=s;}
+  }
+},600);
+function closeIncident(){
+  var inc=state.incident;
+  var secs=Math.floor((inc.confirmedAt-inc.t0)/1000);
+  log('事件 EV-0712-03 关闭归档 · 响应用时 '+pad(Math.floor(secs/60))+':'+pad(secs%60)+' · 可回放复盘','ok');
+  inc.units.forEach(function(en){
+    en.status='normal';en.mission=null;en.seg=nearestSeg(en);en.t=0;
+  });
+  state.incident=null;state.alerts=0;
+  $('kAlert').textContent='0';$('kAlert').className='';
+  $('kResp').textContent=Math.floor(secs/60)+"'"+pad(secs%60)+'"';
+  $('alertBanner').classList.remove('show');
+  alertG.setAttribute('opacity','0');
+  if(ringTimer)clearInterval(ringTimer);
+  $('drillBtn').disabled=false;
+  $('rpToggle').disabled=false;
+  renderWf();
+  toast('事件已归档 · 底部「进入回放」可复盘全过程');
+}
+
+/* ================= VIEWS ================= */
+function setView(v){
+  state.view=v;
+  $('vMain').setAttribute('aria-pressed',v==='main');
+  $('vDrone').setAttribute('aria-pressed',v==='drone');
+  $('vMobile').setAttribute('aria-pressed',v==='mobile');
+  $('hud').classList.toggle('show',v==='drone');
+  $('phoneLayer').classList.toggle('show',v==='mobile');
+  if(v==='drone'){toast('无人机视角 · 镜头跟随 D-01（同一份数据）');}
+}
+$('vMain').addEventListener('click',function(){setView('main')});
+$('vDrone').addEventListener('click',function(){setView('drone')});
+$('vMobile').addEventListener('click',function(){setView('mobile')});
+$('phoneClose').addEventListener('click',function(){setView('main')});
+
+/* phone tasks */
+var pTasks=[
+  {txt:'A 区 3–4 排组串外观检查',done:true},
+  {txt:'A 区汇流箱 A-07 测温复核',done:false},
+  {txt:'逆变器室 1# 滤网状态确认',done:false}
+];
+function renderPhone(){
+  var p1=byId('P-01');
+  var html='';
+  if(p1.status==='respond')html+='<button class="p-task dispatch"><span class="cb">!</span>⚠ 新派单：前往升压站异常点协同处置</button>';
+  pTasks.forEach(function(t,i){
+    html+='<button class="p-task'+(t.done?' done':'')+'" data-i="'+i+'"><span class="cb">'+(t.done?'✓':'')+'</span>'+t.txt+'</button>';
+  });
+  $('pTasks').innerHTML=html;
+  document.querySelectorAll('.p-task[data-i]').forEach(function(b){
+    b.addEventListener('click',function(){
+      var t=pTasks[+b.dataset.i];
+      if(t.done)return;
+      t.done=true;
+      log('P-01（移动端）完成任务：'+t.txt,'ok');
+      if(state.tasksDone<24){state.tasksDone++;$('kTask').innerHTML=state.tasksDone+'<span style="font-size:11px;color:var(--faint)">/24</span>';}
+      renderPhone();toast('任务完成已同步至大屏');
+    });
+  });
+}
+renderPhone();setInterval(renderPhone,4000);
+$('pReport').addEventListener('click',function(){
+  log('P-01 现场上报：A 区 3 排东侧组件表面积灰偏重，建议纳入下次清洗计划','sys');
+  toast('上报已同步 · 见大屏事件流');
+});
+
+/* ================= REPLAY ================= */
+var rpOn=false;
+$('rpToggle').addEventListener('click',function(){
+  if(state.incident)return;
+  rpOn=!rpOn;
+  if(rpOn){
+    if(state.history.length<8){toast('轨迹数据积累中，请稍后再试');rpOn=false;return;}
+    state.mode='replay';
+    $('rpToggle').textContent='返回实时';$('rpToggle').classList.add('on');
+    $('rpSlider').classList.add('show');
+    $('replayBanner').classList.add('show');
+    $('liveTag').classList.add('off');$('liveTxt').textContent='PAUSED VIEW';
+    $('rpRange').max=state.history.length-1;$('rpRange').value=state.history.length-1;
+    deselect();cancelTargeting();
+    applyReplay(state.history.length-1);
+    log('进入回放模式 · 时间窗最近 '+Math.round(state.history.length*.5)+' 秒','sys');
+  }else{
+    state.mode='live';
+    $('rpToggle').textContent='◉ 进入回放';$('rpToggle').classList.remove('on');
+    $('rpSlider').classList.remove('show');
+    $('replayBanner').classList.remove('show');
+    $('liveTag').classList.remove('off');$('liveTxt').textContent='LIVE';
+    entities.forEach(function(en){en.g.setAttribute('transform','translate('+en.x+','+en.y+')')});
+  }
+});
+$('rpRange').addEventListener('input',function(){applyReplay(+this.value)});
+function applyReplay(idx){
+  var snap=state.history[idx];if(!snap)return;
+  snap.pos.forEach(function(p,i){entities[i].g.setAttribute('transform','translate('+p[0]+','+p[1]+')')});
+  alertG.setAttribute('opacity',snap.alert?'1':'0');
+  var ago=Math.round((Date.now()-snap.t)/1000);
+  $('rpAt').textContent=ago<2?'现在':'-'+pad(Math.floor(ago/60))+':'+pad(ago%60);
+  $('rpFrom').textContent='-'+pad(Math.floor(state.history.length*.5/60))+':'+pad(Math.round(state.history.length*.5)%60);
+}
+
+/* ================= MISC ================= */
+var toasts=$('toasts');
+function toast(msg){
+  var t=document.createElement('div');t.className='toast';t.textContent=msg;
+  toasts.appendChild(t);setTimeout(function(){t.remove()},3200);
+}
+$('obStart').addEventListener('click',function(){
+  $('onboard').classList.add('hide');
+  toast('提示：点选图上任意主体开始');
+});
+})();
+</script>
+</body>
+</html>
