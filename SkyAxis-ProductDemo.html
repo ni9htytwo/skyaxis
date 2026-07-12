@@ -404,7 +404,14 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offse
   .narrow-note{
     display:flex;flex:1;align-items:center;justify-content:center;text-align:center;
     padding:40px;color:var(--dim);font-size:14px;line-height:2.2;
+    flex-direction:column;gap:20px;
   }
+  .narrow-back{
+    font-size:13px;font-weight:500;letter-spacing:.08em;color:var(--blue);
+    border:1px solid var(--line-hi);background:transparent;border-radius:6px;
+    padding:10px 28px;cursor:pointer;transition:background .2s,color .2s;
+  }
+  .narrow-back:hover{background:rgba(79,195,247,.1);color:var(--ink)}
 }
 @media (prefers-reduced-motion:reduce){
   .livedot,.rtabs .dot,.hud .rec{animation:none}
@@ -633,7 +640,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offse
 </footer>
 
 <div class="toasts" id="toasts"></div>
-<div class="narrow-note">此产品演示为指挥大屏 / 桌面工作台形态，请在宽度 ≥ 880px 的屏幕上打开。<br>移动巡检端形态已内置于演示中（顶部视角切换）。</div>
+<div class="narrow-note">此产品演示为指挥大屏 / 桌面工作台形态，请在宽度 ≥ 880px 的屏幕上打开。<br>移动巡检端形态已内置于演示中（顶部视角切换）。<br><button class="narrow-back" id="narrowBack">← 返回</button></div>
 
 <script>
 (function(){
@@ -1267,8 +1274,15 @@ function toast(msg){
   toasts.appendChild(t);setTimeout(function(){t.remove()},3200);
 }
 $('obStart').addEventListener('click',function(){
+  if(window.innerWidth<880){
+    toast('请使用宽度 ≥ 880px 的屏幕打开本演示');
+    return;
+  }
   $('onboard').classList.add('hide');
   toast('提示：点选图上任意主体开始');
+});
+if($('narrowBack'))$('narrowBack').addEventListener('click',function(){
+  $('onboard').classList.remove('hide');
 });
 })();
 </script>
