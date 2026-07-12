@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkyAxis 天域枢 · 交互式解决方案</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#061527;
+  --bg2:#081D36;
+  --panel:#0B2440;
+  --panel2:#0E2D52;
+  --line:#1B3A5C;
+  --line-soft:rgba(79,195,247,.14);
+  --ink:#EAF3FA;
+  --dim:#93B4CE;
+  --faint:#5E7F9C;
+  --blue:#4FC3F7;
+  --blue2:#1B76C8;
+  --amber:#FFB020;
+  --green:#3DDC97;
+  --serif:'Noto Serif SC',serif;
+  --sans:'Noto Sans SC',-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:'IBM Plex Mono','Noto Sans SC',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:15px;
+  line-height:1.85;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(1100px 500px at 75% -10%, rgba(27,118,200,.16), transparent 60%),
+    radial-gradient(800px 600px at -10% 40%, rgba(27,118,200,.08), transparent 60%);
+  pointer-events:none;z-index:0;
+}
+::selection{background:rgba(79,195,247,.3)}
+a{color:var(--blue);text-decoration:none}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+
+/* ---------- top nav ---------- */
+.topnav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  background:rgba(6,21,39,.82);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.topnav-in{
+  max-width:1120px;margin:0 auto;padding:0 28px;
+  display:flex;align-items:center;gap:22px;height:52px;
+}
+.brand{font-family:var(--serif);font-weight:600;font-size:16px;letter-spacing:.02em;white-space:nowrap}
+.brand small{font-family:var(--mono);font-size:9px;color:var(--faint);letter-spacing:.22em;margin-left:8px;text-transform:uppercase}
+.navlinks{display:flex;gap:18px;margin-left:auto}
+.navlinks a{font-size:12px;color:var(--dim);letter-spacing:.06em;transition:color .2s;white-space:nowrap}
+.navlinks a:focus-visible{color:var(--blue)}
+.nav-clock{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.08em;white-space:nowrap}
+@media (max-width:760px){
+  .topnav-in{flex-wrap:wrap;height:auto;padding:10px 18px 0}
+  .brand small{display:none}
+  .nav-clock{margin-left:auto}
+  .navlinks{
+    order:3;width:100%;margin:10px -18px 0;padding:0 18px 10px;gap:16px;
+    overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  }
+  .navlinks::-webkit-scrollbar{display:none}
+  .navlinks a{flex:0 0 auto}
+}
+section.block,.map-sec{scroll-margin-top:64px}
+@media (max-width:760px){ section.block,.map-sec{scroll-margin-top:104px} }
+
+/* ---------- hero ---------- */
+.hero{padding:118px 0 36px}
+.eyebrow{
+  font-family:var(--mono);font-size:10px;letter-spacing:.32em;
+  color:var(--blue);text-transform:uppercase;margin-bottom:20px;
+  display:flex;align-items:center;gap:12px;
+}
+.eyebrow::before{content:'';width:26px;height:1px;background:var(--blue)}
+h1{
+  font-family:var(--serif);font-weight:700;
+  font-size:clamp(34px,5.4vw,58px);line-height:1.15;letter-spacing:.01em;
+  margin-bottom:10px;
+}
+h1 .thin{color:var(--dim);font-weight:500;display:block;font-size:.52em;line-height:1.55;letter-spacing:.01em;margin-top:12px}
+h1 .thin b{color:var(--blue);font-weight:500}
+.hero-en{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.2em;text-transform:uppercase;margin-bottom:26px}
+.hero-lead{max-width:640px;color:var(--dim);font-size:15.5px}
+.hero-lead strong{color:var(--ink);font-weight:500}
+
+/* stat strip */
+.stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:var(--line);border:1px solid var(--line);
+  margin:38px 0 0;
+}
+.stat{background:var(--bg2);padding:18px 20px}
+.stat b{
+  font-family:var(--mono);font-weight:500;font-size:28px;color:var(--blue);
+  display:block;line-height:1.2;
+}
+.stat span{font-size:11.5px;color:var(--faint);letter-spacing:.05em}
+@media (max-width:760px){.stats{grid-template-columns:1fr 1fr}}
+
+/* ---------- live map section ---------- */
+.map-sec{padding:44px 0 30px}
+.map-frame{
+  border:1px solid var(--line);background:var(--bg2);
+  border-radius:6px;overflow:hidden;
+  box-shadow:0 24px 70px rgba(0,0,0,.45);
+}
+.map-toolbar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:12px 16px;border-bottom:1px solid var(--line);
+  background:rgba(11,36,64,.55);
+}
+.map-title{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase;margin-right:auto;display:flex;align-items:center;gap:8px}
+.livedot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 1.6s infinite}
+@keyframes blink{50%{opacity:.35}}
+.chip{
+  font-family:var(--sans);font-size:12px;color:var(--dim);
+  border:1px solid var(--line);border-radius:100px;
+  padding:4px 13px;background:transparent;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;transition:all .2s;
+}
+.chip .sw{width:8px;height:8px;border-radius:2px;background:var(--blue)}
+.chip[data-on="1"]{color:var(--ink);border-color:rgba(79,195,247,.5);background:rgba(79,195,247,.08)}
+.chip[data-on="0"]{opacity:.42}
+.drill-btn{
+  font-family:var(--sans);font-size:12.5px;font-weight:500;letter-spacing:.06em;
+  color:#0A1626;background:var(--amber);border:none;border-radius:4px;
+  padding:7px 16px;cursor:pointer;transition:transform .15s, box-shadow .2s;
+}
+.drill-btn:disabled{opacity:.45;cursor:default}
+.map-body{display:grid;grid-template-columns:1fr 300px}
+@media (max-width:900px){.map-body{grid-template-columns:1fr}}
+.map-stage{position:relative;background:#07182C}
+.map-stage svg{display:block;width:100%;height:auto}
+.map-hud{
+  position:absolute;top:12px;left:14px;
+  font-family:var(--mono);font-size:10.5px;color:var(--faint);
+  letter-spacing:.1em;line-height:1.9;pointer-events:none;
+}
+.map-hud b{color:var(--blue);font-weight:500}
+.map-hint{
+  position:absolute;bottom:10px;left:14px;
+  font-size:11px;color:var(--faint);pointer-events:none;opacity:.85;
+}
+.tooltip{
+  position:absolute;z-index:5;min-width:172px;
+  background:rgba(8,23,42,.96);border:1px solid rgba(79,195,247,.45);
+  border-radius:5px;padding:10px 13px;pointer-events:none;
+  font-size:12px;line-height:1.7;color:var(--dim);
+  box-shadow:0 12px 30px rgba(0,0,0,.5);
+  opacity:0;transform:translateY(4px);transition:opacity .18s,transform .18s;
+}
+.tooltip.show{opacity:1;transform:translateY(0)}
+.tooltip h4{font-size:13px;color:var(--ink);font-weight:500;margin-bottom:2px;font-family:var(--sans)}
+.tooltip .tt-status{font-family:var(--mono);font-size:10px;letter-spacing:.08em}
+.log-panel{
+  border-left:1px solid var(--line);background:rgba(6,20,37,.6);
+  display:flex;flex-direction:column;min-height:0;
+}
+@media (max-width:900px){.log-panel{border-left:none;border-top:1px solid var(--line)}}
+.log-head{
+  font-family:var(--mono);font-size:10px;letter-spacing:.22em;color:var(--faint);
+  text-transform:uppercase;padding:12px 16px;border-bottom:1px solid var(--line);
+}
+.log-list{
+  padding:10px 16px 16px;overflow-y:auto;max-height:430px;flex:1;
+  font-family:var(--mono);font-size:11px;line-height:1.75;
+}
+@media (max-width:900px){.log-list{max-height:200px}}
+.log-item{margin-bottom:9px;color:var(--dim);opacity:0;transform:translateX(-6px);animation:login .35s forwards}
+@keyframes login{to{opacity:1;transform:none}}
+.log-item .t{color:var(--faint);margin-right:8px}
+.log-item.warn{color:var(--amber)}
+.log-item.ok{color:var(--green)}
+.log-item.sys{color:var(--blue)}
+
+/* ---------- shared section chrome ---------- */
+section.block{padding:74px 0 10px}
+.sec-meta{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.sec-num{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--blue)}
+.sec-line{flex:1;height:1px;background:var(--line)}
+h2{
+  font-family:var(--serif);font-weight:600;font-size:clamp(24px,3.2vw,32px);
+  line-height:1.3;margin-bottom:18px;letter-spacing:.01em;
+}
+.body-text{color:var(--dim);font-size:14.5px;max-width:680px;margin-bottom:14px}
+.body-text strong{color:var(--ink);font-weight:500}
+
+/* reveal on scroll */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- scenario quote ---------- */
+.scenario{
+  margin-top:64px;border-left:2px solid var(--blue2);
+  padding:8px 0 8px 30px;max-width:760px;
+}
+.scenario-label{font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--faint);text-transform:uppercase;margin-bottom:14px}
+.scenario q{
+  font-family:var(--serif);font-size:clamp(17px,2.3vw,21px);line-height:2;
+  color:var(--dim);quotes:none;display:block;
+}
+.scenario q em{font-style:normal;color:var(--ink);border-bottom:1px solid rgba(79,195,247,.4)}
+.scenario .coda{font-family:var(--serif);font-size:clamp(17px,2.3vw,21px);color:var(--blue);margin-top:14px}
+
+/* four systems flashing */
+.sys-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:30px 0 6px;max-width:760px}
+@media (max-width:640px){.sys-row{grid-template-columns:1fr 1fr}}
+.sys-card{
+  border:1px solid var(--line);border-radius:5px;background:var(--bg2);
+  padding:14px 16px;font-size:13px;color:var(--dim);position:relative;overflow:hidden;
+}
+.sys-card i{
+  display:block;font-style:normal;font-family:var(--mono);font-size:9px;
+  letter-spacing:.18em;color:var(--faint);margin-bottom:4px;
+}
+.sys-card.ring{animation:ring 2.8s infinite}
+.sys-card:nth-child(2).ring{animation-delay:.5s}
+.sys-card:nth-child(3).ring{animation-delay:1.1s}
+.sys-card:nth-child(4).ring{animation-delay:1.7s}
+@keyframes ring{
+  0%,88%,100%{border-color:var(--line);box-shadow:none}
+  90%,96%{border-color:var(--amber);box-shadow:0 0 20px rgba(255,176,32,.25)}
+}
+
+/* ---------- before/after toggle ---------- */
+.merge-box{
+  margin-top:30px;border:1px solid var(--line);border-radius:6px;
+  background:var(--bg2);padding:26px 26px 30px;
+}
+.merge-top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.merge-caption{font-size:13px;color:var(--dim)}
+.switch{
+  margin-left:auto;display:inline-flex;border:1px solid var(--line);
+  border-radius:100px;overflow:hidden;
+}
+.switch button{
+  font-family:var(--sans);font-size:12.5px;padding:7px 18px;border:none;cursor:pointer;
+  background:transparent;color:var(--dim);transition:all .25s;
+}
+.switch button[aria-pressed="true"]{background:var(--blue2);color:#fff}
+.merge-stage{position:relative;height:250px;border-radius:5px;overflow:hidden;transition:background .6s}
+.merge-stage[data-mode="one"]{background:#07182C}
+.mini{
+  position:absolute;border:1px solid var(--line);border-radius:5px;
+  background:#0A2038;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;font-size:12.5px;color:var(--dim);
+  transition:all .8s cubic-bezier(.6,.05,.2,1);
+  width:23%;height:46%;z-index:1;
+}
+.mini .glyph{color:var(--blue);opacity:.85}
+.mini .glyph svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.merge-stage[data-mode="four"] .m1{left:0;top:0}
+.merge-stage[data-mode="four"] .m2{left:25.5%;top:0}
+.merge-stage[data-mode="four"] .m3{left:0;top:54%}
+.merge-stage[data-mode="four"] .m4{left:25.5%;top:54%}
+.merge-stage[data-mode="one"] .mini{
+  left:0;top:0;width:100%;height:100%;
+  background:rgba(27,118,200,.05);border-color:rgba(79,195,247,.35);
+}
+.merge-stage[data-mode="one"] .mini span{opacity:0;transition:opacity .3s}
+.merge-stage[data-mode="one"] .m1 .glyph{transform:translate(-160px,-40px)}
+.merge-stage[data-mode="one"] .m2 .glyph{transform:translate(120px,-55px)}
+.merge-stage[data-mode="one"] .m3 .glyph{transform:translate(-90px,55px)}
+.merge-stage[data-mode="one"] .m4 .glyph{transform:translate(150px,45px)}
+.mini .glyph{transition:transform .8s cubic-bezier(.6,.05,.2,1)}
+
+/* unified-view backdrop: coordinate grid, radar ring, live entity dots */
+.merge-grid{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:0;transition:opacity .6s .15s;pointer-events:none}
+.merge-stage[data-mode="one"] .merge-grid{opacity:1}
+.mg-ring{transform-origin:200px 125px;animation:mgspin 7s linear infinite}
+@keyframes mgspin{to{transform:rotate(360deg)}}
+.mg-dot{fill:var(--blue);opacity:0}
+.merge-stage[data-mode="one"] .mg-dot{opacity:.85;animation:mgpulse 2.4s ease-in-out infinite}
+.mg-dot.dt2{animation-delay:.4s}
+.mg-dot.dt3{animation-delay:.8s}
+.mg-dot.dt4{animation-delay:1.2s}
+.mg-dot.dt5{animation-delay:1.6s}
+@keyframes mgpulse{0%,100%{opacity:.35;r:2.2px}50%{opacity:1;r:3.4px}}
+
+.merge-live-badge{
+  position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:3;
+  display:inline-flex;align-items:center;gap:7px;white-space:nowrap;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--dim);
+  border:1px solid rgba(79,195,247,.35);border-radius:100px;
+  padding:4px 12px;background:rgba(8,23,42,.65);
+  opacity:0;transition:opacity .5s .5s;
+}
+.merge-live-badge .livedot{width:6px;height:6px}
+.merge-stage[data-mode="one"] .merge-live-badge{opacity:1}
+
+.merge-one-label{
+  position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
+  font-family:var(--serif);font-size:22px;color:var(--ink);letter-spacing:.1em;
+  opacity:0;transition:opacity .5s .4s;pointer-events:none;text-shadow:0 0 26px rgba(79,195,247,.4);
+}
+.merge-one-label small{
+  font-family:var(--mono);font-size:9.5px;color:var(--faint);letter-spacing:.2em;font-weight:400;text-shadow:none;
+}
+.merge-stage[data-mode="one"] .merge-one-label{opacity:1}
+.merge-note{margin-top:16px;font-size:12.5px;color:var(--faint);text-align:center;font-family:var(--mono);letter-spacing:.06em}
+
+/* ---------- capabilities ---------- */
+.cap-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:30px;
+}
+@media (max-width:900px){.cap-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:600px){.cap-grid{grid-template-columns:1fr}}
+.cap{
+  border:1px solid var(--line);border-radius:6px;background:var(--bg2);
+  padding:22px 22px 20px;cursor:pointer;text-align:left;color:inherit;font-family:inherit;
+  transition:border-color .25s, transform .25s, background .25s;position:relative;
+}
+.cap:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.cap-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.cap-num{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;color:var(--faint);text-transform:uppercase;padding-top:4px}
+.cap-icon{width:30px;height:30px;color:var(--blue)}
+.cap-icon svg{width:100%;height:100%;stroke:currentColor;stroke-width:1.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.cap h3{font-family:var(--serif);font-weight:600;font-size:16.5px;color:var(--ink);margin-bottom:7px;line-height:1.4}
+.cap p{font-size:12.5px;color:var(--dim);line-height:1.75}
+.cap .more{
+  font-size:12.5px;color:var(--faint);line-height:1.8;
+  max-height:0;overflow:hidden;transition:max-height .45s ease,margin .45s ease,opacity .4s;
+  opacity:0;border-top:1px dashed transparent;
+}
+.cap[aria-expanded="true"]{background:rgba(27,118,200,.07);border-color:rgba(79,195,247,.45)}
+.cap[aria-expanded="true"] .more{max-height:200px;margin-top:12px;padding-top:12px;opacity:1;border-top-color:var(--line)}
+.cap .plus{
+  position:absolute;right:16px;bottom:14px;font-family:var(--mono);
+  font-size:13px;color:var(--faint);transition:transform .3s;
+}
+.cap[aria-expanded="true"] .plus{transform:rotate(45deg);color:var(--blue)}
+
+/* ---------- architecture ---------- */
+.arch{margin-top:30px;display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:stretch}
+@media (max-width:900px){.arch{grid-template-columns:1fr}}
+.arch-stack{display:flex;flex-direction:column;gap:0;position:relative}
+.layer{
+  border:1px solid var(--line);border-radius:6px;background:var(--bg2);
+  padding:20px 24px;cursor:pointer;transition:all .3s;position:relative;
+  text-align:left;color:inherit;font-family:inherit;width:100%;
+}
+.layer + .arch-conn{align-self:center}
+.layer .l-tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.24em;color:var(--faint);text-transform:uppercase;margin-bottom:7px}
+.layer .l-body{font-size:13.5px;color:var(--dim);line-height:1.8}
+.layer.mid{background:var(--panel2);border-color:#23507F}
+.layer.mid .l-tag{color:var(--blue)}
+.layer.mid .l-body{color:#DCEBF7}
+.layer .l-name{font-family:var(--serif);font-size:15px;color:var(--ink);margin-right:10px;font-weight:600}
+.arch.has-focus .layer{opacity:.35}
+.arch.has-focus .layer.focus{opacity:1;border-color:rgba(79,195,247,.6);box-shadow:0 0 0 1px rgba(79,195,247,.25)}
+.arch-conn{height:46px;width:100%;position:relative}
+.arch-conn svg{position:absolute;inset:0;width:100%;height:100%}
+.arch-note{
+  border:1px dashed var(--line);border-radius:6px;padding:20px 22px;
+  font-size:13px;color:var(--dim);line-height:1.9;background:rgba(11,36,64,.35);
+  display:flex;flex-direction:column;gap:14px;
+}
+.arch-note .an-title{font-family:var(--mono);font-size:10px;letter-spacing:.24em;color:var(--faint);text-transform:uppercase}
+.arch-note .an-body{transition:opacity .25s}
+.arch-legend{margin-top:auto;font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.06em;line-height:2}
+.arch-legend .dn{color:var(--blue)}
+.arch-legend .up{color:var(--green)}
+.trust-line{
+  margin-top:20px;display:flex;gap:10px;align-items:flex-start;
+  font-size:12.5px;color:var(--dim);max-width:760px;
+}
+.trust-line svg{width:18px;height:18px;flex-shrink:0;stroke:var(--blue);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;margin-top:3px}
+
+/* ---------- PoC timeline ---------- */
+.poc-bar{
+  margin:34px 0 10px;position:relative;height:6px;border-radius:3px;
+  background:var(--line);overflow:hidden;
+}
+.poc-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,var(--blue2),var(--blue));transition:width .6s cubic-bezier(.5,0,.2,1)}
+.poc-weeks{
+  display:flex;justify-content:space-between;font-family:var(--mono);
+  font-size:10px;color:var(--faint);letter-spacing:.1em;margin:8px 2px 26px;
+}
+.poc-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media (max-width:860px){.poc-steps{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.poc-steps{grid-template-columns:1fr}}
+.poc-step{
+  border:1px solid var(--line);border-radius:6px;background:var(--bg2);
+  padding:18px;cursor:pointer;transition:all .25s;text-align:left;color:inherit;font-family:inherit;
+}
+.poc-step:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.poc-step.active{border-color:rgba(79,195,247,.6);background:rgba(27,118,200,.08)}
+.poc-step .p-num{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.2em;margin-bottom:8px}
+.poc-step.active .p-num{color:var(--blue)}
+.poc-step h3{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);line-height:1.45}
+.poc-detail{
+  margin-top:22px;border-left:2px solid var(--blue2);padding:6px 0 6px 22px;
+  min-height:86px;
+}
+.poc-detail .pd-title{font-family:var(--serif);font-size:17px;color:var(--ink);font-weight:600;margin-bottom:6px}
+.poc-detail .pd-dur{font-family:var(--mono);font-size:10.5px;color:var(--blue);letter-spacing:.14em;margin-bottom:8px}
+.poc-detail p{font-size:13.5px;color:var(--dim);max-width:700px}
+
+/* ---------- footer ---------- */
+.footer{
+  margin-top:90px;border-top:1px solid var(--line);
+  background:linear-gradient(180deg,var(--bg2),var(--panel2));
+}
+.footer-in{
+  max-width:1120px;margin:0 auto;padding:56px 28px 50px;
+  display:grid;grid-template-columns:1.4fr 1fr;gap:44px;align-items:center;
+}
+@media (max-width:800px){.footer-in{grid-template-columns:1fr}}
+.trust-text{font-size:13px;color:var(--dim);line-height:2}
+.trust-text strong{color:var(--ink)}
+.cta-col{text-align:right}
+@media (max-width:800px){.cta-col{text-align:left}}
+.cta-btn{
+  display:inline-block;font-size:13px;font-weight:500;letter-spacing:.14em;
+  color:#07182C;background:var(--blue);padding:14px 30px;border-radius:4px;
+  transition:transform .2s, box-shadow .2s;
+}
+.cta-contact{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:14px;letter-spacing:.06em}
+.doc-footer{
+  border-top:1px solid var(--line);padding:14px 28px;
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;
+  max-width:1120px;margin:0 auto;
+  font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.08em;
+}
+
+/* ---------- hover effects: real pointers only, avoids sticky-hover on touch ---------- */
+@media (hover:hover) and (pointer:fine){
+  .navlinks a:hover{color:var(--blue)}
+  .chip:hover{border-color:var(--blue)}
+  .drill-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 18px rgba(255,176,32,.35)}
+  .cap:hover{border-color:rgba(79,195,247,.5);transform:translateY(-3px)}
+  .poc-step:hover{border-color:rgba(79,195,247,.4)}
+  .cta-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(79,195,247,.3);color:#07182C}
+}
+
+/* ---------- touch comfort ---------- */
+button,a,.chip,.cap,.poc-step,.layer{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+
+/* ==================================================================
+   MOBILE-FIRST READING PASS
+   Below ~760px this is read top-to-bottom on a phone, not scanned
+   on a wide monitor — tighten measure, enlarge tap targets, keep the
+   live map legible instead of shrinking it to illegibility.
+   ================================================================== */
+@media (max-width:760px){
+  .wrap{padding:0 18px}
+  body{font-size:15.5px}
+
+  /* hero: shorter top offset for the taller 2-row mobile nav, calmer rhythm */
+  .hero{padding:128px 0 30px}
+  .eyebrow{letter-spacing:.18em;font-size:9.5px;margin-bottom:16px}
+  .hero-en{letter-spacing:.12em;margin-bottom:20px}
+  .hero-lead{font-size:15px;max-width:none}
+  .stats{margin-top:28px}
+  .stat{padding:14px 14px}
+  .stat b{font-size:23px}
+
+  /* section rhythm: less dead air between blocks while scrolling on a phone */
+  section.block{padding:52px 0 6px}
+  .footer{margin-top:60px}
+
+  /* live map: keep the graphic at a readable fixed width and let people
+     pan it, rather than scaling site labels down to unreadable specks */
+  .map-toolbar{padding:10px 12px;gap:8px}
+  .map-title{width:100%;margin-right:0;font-size:10px}
+  .chip{padding:7px 13px;font-size:12px}
+  .drill-btn{width:100%;padding:10px 16px;margin-top:2px}
+  .map-stage{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .map-stage svg{min-width:820px}
+  .map-hud{font-size:10px}
+  .map-hint{padding-right:14px}
+
+  /* merge-box (four screens vs one map) demo: keep proportions sane */
+  .merge-top{gap:10px}
+  .switch{margin-left:0}
+  .merge-stage{height:220px}
+  .mini{font-size:11px;gap:4px}
+  .mini .glyph svg{width:19px;height:19px}
+  .merge-one-label{font-size:18px}
+
+  /* capability / architecture / PoC cards: tighter padding, still airy */
+  .cap{padding:18px 18px 16px}
+  .layer{padding:16px 18px}
+  .poc-step{padding:15px}
+  .arch-note{padding:16px 18px}
+
+  /* footer + CTA: full-width tap target, less side padding */
+  .footer-in{padding:40px 18px 36px;gap:26px}
+  .cta-btn{display:block;text-align:center;padding:15px 20px}
+  .doc-footer{padding:14px 18px;font-size:9.5px}
+}
+
+@media (max-width:420px){
+  .stats{grid-template-columns:1fr}
+  .stat{padding:12px 16px}
+  .stat b{font-size:22px}
+  h1{font-size:clamp(30px,9vw,40px)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav" aria-label="页面导航">
+  <div class="topnav-in">
+    <div class="brand">SkyAxis 天域枢<small>One Map</small></div>
+    <div class="navlinks">
+      <a href="#map">实时一张图</a>
+      <a href="#why">为什么</a>
+      <a href="#cap">核心能力</a>
+      <a href="#arch">怎么工作</a>
+      <a href="#poc">PoC 合作</a>
+    </div>
+    <div class="nav-clock" id="navClock">--:--:--</div>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <div class="eyebrow">Solution Brief · 人机协同监管台</div>
+  <h1>SkyAxis 天域枢<span class="thin">专业管理<b>"复杂"</b>与<b>"突发"</b>，让负责人压力骤减、时刻心中有数。</span></h1>
+  <div class="hero-en">Human-Machine Collaborative Operations Platform</div>
+  <p class="hero-lead">当场站或园区同时拥有人员、车辆、机器人、无人机时，天域枢让人能在<strong>同一张图</strong>上<strong>看清全局、指挥全域</strong>。</p>
+
+  <div class="stats reveal">
+    <div class="stat"><b data-count="4">0</b><span>类主体 · 人 车 机器人 无人机</span></div>
+    <div class="stat"><b data-count="1">0</b><span>张图 · 同一个三维空间坐标系</span></div>
+    <div class="stat"><b data-count="3">0</b><span>个月 · PoC 概念验证周期</span></div>
+    <div class="stat"><b data-count="10">0</b><span>年 · 三维 GIS 技术工程验证</span></div>
+  </div>
+</header>
+
+<!-- ============ LIVE MAP ============ -->
+<section class="map-sec wrap" id="map">
+  <div class="map-frame reveal">
+    <div class="map-toolbar">
+      <div class="map-title"><span class="livedot"></span>场站实时态势 · 模拟演示</div>
+      <button class="chip" data-layer="person" data-on="1"><span class="sw" style="background:#4FC3F7"></span>人员</button>
+      <button class="chip" data-layer="vehicle" data-on="1"><span class="sw" style="background:#8AB4F8;border-radius:1px"></span>车辆</button>
+      <button class="chip" data-layer="robot" data-on="1"><span class="sw" style="background:transparent;border:1.5px solid #4FC3F7"></span>机器人</button>
+      <button class="chip" data-layer="drone" data-on="1"><span class="sw" style="background:#3DDC97;border-radius:50%"></span>无人机</button>
+      <button class="drill-btn" id="drillBtn">▶ 演练：触发异常</button>
+    </div>
+    <div class="map-body">
+      <div class="map-stage" id="mapStage">
+        <svg id="siteMap" viewBox="0 0 1000 560" role="img" aria-label="场站三维态势模拟图：人员、车辆、机器人与无人机在同一张图上实时移动">
+          <defs>
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M40 0H0V40" fill="none" stroke="#123152" stroke-width="0.6"/>
+            </pattern>
+            <radialGradient id="alertGlow">
+              <stop offset="0%" stop-color="#FFB020" stop-opacity=".5"/>
+              <stop offset="100%" stop-color="#FFB020" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <rect width="1000" height="560" fill="url(#grid)"/>
+          <!-- zones -->
+          <g font-family="'IBM Plex Mono',monospace" font-size="10" letter-spacing="2">
+            <rect x="60" y="60" width="300" height="180" rx="4" fill="rgba(27,118,200,.05)" stroke="#1B3A5C"/>
+            <text x="76" y="84" fill="#5E7F9C">光伏阵列 A 区</text>
+            <g stroke="#16406B" stroke-width="5" opacity=".7">
+              <line x1="85" y1="110" x2="335" y2="110"/><line x1="85" y1="140" x2="335" y2="140"/>
+              <line x1="85" y1="170" x2="335" y2="170"/><line x1="85" y1="200" x2="335" y2="200"/>
+            </g>
+            <rect x="60" y="300" width="300" height="180" rx="4" fill="rgba(27,118,200,.05)" stroke="#1B3A5C"/>
+            <text x="76" y="324" fill="#5E7F9C">光伏阵列 B 区</text>
+            <g stroke="#16406B" stroke-width="5" opacity=".7">
+              <line x1="85" y1="350" x2="335" y2="350"/><line x1="85" y1="380" x2="335" y2="380"/>
+              <line x1="85" y1="410" x2="335" y2="410"/><line x1="85" y1="440" x2="335" y2="440"/>
+            </g>
+            <rect x="600" y="80" width="200" height="150" rx="4" fill="rgba(255,176,32,.04)" stroke="#1B3A5C"/>
+            <text x="616" y="104" fill="#5E7F9C">升压站</text>
+            <rect x="640" y="130" width="40" height="60" fill="none" stroke="#23507F"/>
+            <rect x="710" y="130" width="40" height="60" fill="none" stroke="#23507F"/>
+            <rect x="600" y="300" width="200" height="120" rx="4" fill="rgba(27,118,200,.05)" stroke="#1B3A5C"/>
+            <text x="616" y="324" fill="#5E7F9C">储能区</text>
+            <g fill="none" stroke="#23507F"><rect x="625" y="345" width="30" height="50"/><rect x="668" y="345" width="30" height="50"/><rect x="711" y="345" width="30" height="50"/><rect x="754" y="345" width="30" height="50"/></g>
+            <rect x="860" y="250" width="90" height="140" rx="4" fill="rgba(27,118,200,.05)" stroke="#1B3A5C"/>
+            <text x="872" y="274" fill="#5E7F9C">值班楼</text>
+          </g>
+          <!-- roads -->
+          <g stroke="#1B3A5C" stroke-width="14" stroke-linecap="round" fill="none" opacity=".55">
+            <path d="M440 40 V520"/>
+            <path d="M440 260 H960"/>
+          </g>
+          <g stroke="#2C578A" stroke-width="1" stroke-dasharray="8 10" fill="none" opacity=".6">
+            <path d="M440 40 V520"/><path d="M440 260 H960"/>
+          </g>
+          <!-- alert -->
+          <g id="alertG" opacity="0" pointer-events="none">
+            <circle id="alertGlowC" r="46" fill="url(#alertGlow)"/>
+            <circle id="alertRing" r="12" fill="none" stroke="#FFB020" stroke-width="2"/>
+            <path id="alertMark" d="M0 -6 V2 M0 6.5 V6.6" stroke="#FFB020" stroke-width="2.4" stroke-linecap="round"/>
+            <text id="alertLabel" y="-24" text-anchor="middle" font-family="'IBM Plex Mono',monospace" font-size="10" fill="#FFB020" letter-spacing="2">异常 · 升压站</text>
+          </g>
+          <g id="dispatchLines" stroke="#FFB020" stroke-width="1.4" stroke-dasharray="5 6" fill="none" opacity="0"></g>
+          <g id="entities"></g>
+        </svg>
+        <div class="map-hud">
+          <div>SITE&nbsp;·&nbsp;某新能源场站&nbsp;&nbsp;<b id="hudClock">--:--:--</b></div>
+          <div>在图主体&nbsp;<b id="hudCount">9</b>&nbsp;·&nbsp;状态&nbsp;<b id="hudState" style="color:var(--green)">正常</b></div>
+        </div>
+        <div class="map-hint">点击图上任一主体查看状态 · 右上角可触发异常演练 · 手机端可左右滑动查看全图</div>
+        <div class="tooltip" id="tooltip" role="status"></div>
+      </div>
+      <aside class="log-panel">
+        <div class="log-head">事件记录 · 自动留痕</div>
+        <div class="log-list" id="logList"></div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SCENARIO ============ -->
+<div class="wrap">
+  <div class="scenario reveal">
+    <div class="scenario-label">处境 · The Situation</div>
+    <q>你不缺系统。你有人员定位，有车辆调度，有机器人后台，有无人机飞控。<em>你缺的是，当这四套系统同时响的那一刻，有人能告诉你：现在，到底发生了什么。</em></q>
+    <div class="coda">那个人，本来应该是你。</div>
+    <div class="sys-row" aria-hidden="true">
+      <div class="sys-card ring"><i>SYS-01</i>人员定位</div>
+      <div class="sys-card ring"><i>SYS-02</i>车辆调度</div>
+      <div class="sys-card ring"><i>SYS-03</i>机器人后台</div>
+      <div class="sys-card ring"><i>SYS-04</i>无人机飞控</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 01 WHY ============ -->
+<section class="block wrap" id="why">
+  <div class="sec-meta reveal"><div class="sec-num">01</div><div class="sec-line"></div></div>
+  <div class="reveal">
+    <h2>为什么现有工具不能解决这个问题</h2>
+    <p class="body-text">SCADA 很好。安防系统不错。各家设备厂商的配套软件也够用。</p>
+    <p class="body-text">不过，SCADA 认识仪表，不知道人在哪。安防系统认识摄像头里的画面，不认识同一时刻在画面外移动的机器人。飞控平台认识无人机，对地面上的一切没啥概念。它们是如此专注地各扫门前雪，而把所有信息归拢成一份"心中有数"的，还得是你。</p>
+    <p class="body-text">于是每次异常响应，你就是唯一焦虑的人。判断力也是力，它需要能量，而这样的能量很容易被纷繁信息冲散和燃烧。</p>
+    <p class="body-text">很多系统是为了管理机器而存在的，很多技术的进步也是为了<strong>机器智能</strong>而存在的。SkyAxis 是为了你而存在的，这个产品设计的初衷是为了<strong>人类智慧</strong>而存在的。我们把场景里所有主体的实时位置与状态放进同一个三维空间坐标系，交给你来调度。如何在压力之下果断做出好决策？我们来解决"果敢"和"当机立断"的障碍——让你能够看得清楚，想得明白，做出你本来就能做出的好决策。</p>
+  </div>
+
+  <div class="merge-box reveal">
+    <div class="merge-top">
+      <div class="merge-caption">切换看看：同样的四类主体，两种呈现方式。</div>
+      <div class="switch" role="group" aria-label="呈现方式切换">
+        <button id="btnFour" aria-pressed="true">过去：四块屏</button>
+        <button id="btnOne" aria-pressed="false">现在：一张图</button>
+      </div>
+    </div>
+    <div class="merge-stage" id="mergeStage" data-mode="four">
+      <svg class="merge-grid" viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <pattern id="mgGrid" width="22" height="22" patternUnits="userSpaceOnUse">
+            <path d="M22 0H0V22" fill="none" stroke="rgba(79,195,247,.14)" stroke-width="1"/>
+          </pattern>
+          <radialGradient id="mgGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#4FC3F7" stop-opacity=".28"/>
+            <stop offset="100%" stop-color="#4FC3F7" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <rect width="400" height="250" fill="url(#mgGrid)"/>
+        <circle cx="200" cy="125" r="100" fill="url(#mgGlow)"/>
+        <circle class="mg-ring" cx="200" cy="125" r="54" fill="none" stroke="#4FC3F7" stroke-width="1" stroke-dasharray="3 6" opacity=".55"/>
+        <circle cx="200" cy="125" r="82" fill="none" stroke="rgba(79,195,247,.18)" stroke-width="1"/>
+        <line x1="200" y1="16" x2="200" y2="234" stroke="rgba(79,195,247,.14)" stroke-width="1"/>
+        <line x1="20" y1="125" x2="380" y2="125" stroke="rgba(79,195,247,.14)" stroke-width="1"/>
+        <g font-family="'IBM Plex Mono',monospace" font-size="8" fill="rgba(94,127,156,.9)" letter-spacing="1">
+          <text x="205" y="28">Z</text>
+          <text x="364" y="120">X</text>
+          <text x="68" y="52">Y</text>
+        </g>
+        <circle class="mg-dot dt1" cx="140" cy="82" r="2.6"/>
+        <circle class="mg-dot dt2" cx="262" cy="150" r="2.6"/>
+        <circle class="mg-dot dt3" cx="178" cy="168" r="2.6"/>
+        <circle class="mg-dot dt4" cx="240" cy="86" r="2.6"/>
+        <circle class="mg-dot dt5" cx="200" cy="125" r="2.6"/>
+      </svg>
+      <div class="merge-live-badge"><span class="livedot"></span>同一坐标系 · 实时同步</div>
+      <div class="mini m1"><span class="glyph"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M6 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/></svg></span><span>人员定位</span></div>
+      <div class="mini m2"><span class="glyph"><svg viewBox="0 0 24 24"><rect x="3" y="10" width="14" height="7" rx="1.5"/><path d="M17 12h3.5v5H17"/><circle cx="7.5" cy="18.5" r="1.6"/><circle cx="16" cy="18.5" r="1.6"/></svg></span><span>车辆调度</span></div>
+      <div class="mini m3"><span class="glyph"><svg viewBox="0 0 24 24"><rect x="7" y="10" width="10" height="9" rx="2"/><path d="M12 10V5.5"/><circle cx="12" cy="4.5" r="1.3"/><circle cx="10" cy="14" r=".8"/><circle cx="14" cy="14" r=".8"/></svg></span><span>机器人后台</span></div>
+      <div class="mini m4"><span class="glyph"><svg viewBox="0 0 24 24"><path d="M5 5l5 5M19 5l-5 5M5 19l5-5M19 19l-5-5"/><circle cx="12" cy="12" r="2.4"/><circle cx="5" cy="5" r="1.6"/><circle cx="19" cy="5" r="1.6"/><circle cx="5" cy="19" r="1.6"/><circle cx="19" cy="19" r="1.6"/></svg></span><span>无人机飞控</span></div>
+      <div class="merge-one-label">一 张 图<small>SkyAxis · 同一三维坐标系</small></div>
+    </div>
+    <div class="merge-note" id="mergeNote">FOUR SCREENS · 四套系统，四块屏，归拢信息的还是你</div>
+  </div>
+</section>
+
+<!-- ============ 02 CAPABILITIES ============ -->
+<section class="block wrap" id="cap">
+  <div class="sec-meta reveal"><div class="sec-num">02</div><div class="sec-line"></div></div>
+  <div class="reveal">
+    <h2>天域枢能为你做这样几件事</h2>
+    <p class="body-text">点开每一项，看它具体怎么替你分担。</p>
+  </div>
+  <div class="cap-grid reveal" id="capGrid">
+    <button class="cap" aria-expanded="false">
+      <div class="cap-top"><div class="cap-num">能力 01</div><div class="cap-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="8.5" cy="9" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="14.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
+      <h3>全域实时态势一张图</h3>
+      <p>所有人、车、机器人、无人机——一张图上全看见。</p>
+      <div class="more">每个主体的实时位置与状态汇入同一个三维空间坐标系。你不再需要在四套系统之间来回切换、在脑中自行拼图。</div>
+      <span class="plus">+</span>
+    </button>
+    <button class="cap" aria-expanded="false">
+      <div class="cap-top"><div class="cap-num">能力 02</div><div class="cap-icon"><svg viewBox="0 0 24 24"><path d="M12 4l8 4.5-8 4.5-8-4.5L12 4z"/><path d="M4 13l8 4.5 8-4.5"/><path d="M4 17l8 4.5 8-4.5" opacity="0.45"/></svg></div></div>
+      <h3>多视角联动</h3>
+      <p>大屏、手机、无人机三种视角，同一份数据，一键切换。</p>
+      <div class="more">指挥大屏看全局，移动端在现场看局部，无人机视角看细节——三种视角背后是同一份实时数据，切换不丢上下文。</div>
+      <span class="plus">+</span>
+    </button>
+    <button class="cap" aria-expanded="false">
+      <div class="cap-top"><div class="cap-num">能力 03</div><div class="cap-icon"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="8" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8 7.2l7.5.7M7.3 8.2l3.5 7.5M16.5 10.2l-3 5.5"/></svg></div></div>
+      <h3>协同调度与指令下达</h3>
+      <p>一个界面调度所有主体，不挑设备品牌。</p>
+      <div class="more">通过开放 API 接入第三方设备，不同品牌的机器人、无人机与人员终端在同一个界面接受调度指令。</div>
+      <span class="plus">+</span>
+    </button>
+    <button class="cap" aria-expanded="false">
+      <div class="cap-top"><div class="cap-num">能力 04</div><div class="cap-icon"><svg viewBox="0 0 24 24"><rect x="3" y="9" width="13" height="8" rx="1.5"/><path d="M16 11.5h3v3h-3"/><path d="M7 12v2M10 11v4M13 12.5v1"/></svg></div></div>
+      <h3>资源保障调度</h3>
+      <p>充电、耗材、维护车辆，状态和派工一目了然。</p>
+      <div class="more">机器人电量、无人机架次、维护车辆的位置与任务状态实时可见，保障派工不再靠电话和记忆。</div>
+      <span class="plus">+</span>
+    </button>
+    <button class="cap" aria-expanded="false">
+      <div class="cap-top"><div class="cap-num">能力 05</div><div class="cap-icon"><svg viewBox="0 0 24 24"><circle cx="13" cy="12" r="8"/><path d="M13 7.5V12l3 2"/><path d="M5 9L2.5 12 5 15"/></svg></div></div>
+      <h3>事件记录与复盘回放</h3>
+      <p>每一步操作自动留痕，复盘时随时回放。</p>
+      <div class="more">从报警响起到事件关闭，每一条指令、每一次位置变化都带时间戳留痕。复盘会上，把当时的态势按时间轴放一遍。</div>
+      <span class="plus">+</span>
+    </button>
+    <button class="cap" aria-expanded="false">
+      <div class="cap-top"><div class="cap-num">能力 06</div><div class="cap-icon"><svg viewBox="0 0 24 24"><path d="M12 4L21 19H3L12 4z"/><path d="M12 10v4"/><circle cx="12" cy="16.5" r="0.9" fill="currentColor" stroke="none"/></svg></div></div>
+      <h3>异常预警与快速处置</h3>
+      <p>报警响起，就地定位、派单、处置。</p>
+      <div class="more">报警点直接落在图上，最近的人员、机器人或无人机就地派单，处置全程在同一张图上跟踪。上方的演练按钮就是这套流程。</div>
+      <span class="plus">+</span>
+    </button>
+  </div>
+</section>
+
+<!-- ============ 03 ARCHITECTURE ============ -->
+<section class="block wrap" id="arch">
+  <div class="sec-meta reveal"><div class="sec-num">03</div><div class="sec-line"></div></div>
+  <div class="reveal">
+    <h2>它是怎么工作的</h2>
+    <p class="body-text">三层结构，全部在你的园区之内。把鼠标移到任意一层，看它负责什么。</p>
+  </div>
+  <div class="arch reveal" id="archBox">
+    <div class="arch-stack">
+      <button class="layer" data-note="值班主管、巡检员、指挥中心——你和你的团队通过这些终端看同一份数据。大屏看全局，手机在现场，无人机视角看细节。">
+        <div class="l-tag">你在这里看它</div>
+        <div class="l-body"><span class="l-name">呈现层</span>大屏指挥端 · Web 浏览器 · 移动巡检端 · 无人机视角</div>
+      </button>
+      <div class="arch-conn"><svg viewBox="0 0 600 46" preserveAspectRatio="none">
+        <line x1="150" y1="0" x2="150" y2="46" stroke="#1B3A5C" stroke-width="1"/>
+        <line x1="450" y1="0" x2="450" y2="46" stroke="#1B3A5C" stroke-width="1"/>
+        <circle class="flow up" cx="150" cy="46" r="3" fill="#3DDC97"/>
+        <circle class="flow down" cx="450" cy="0" r="3" fill="#4FC3F7"/>
+      </svg></div>
+      <button class="layer mid" data-note="SkyAxis 平台本体：把三维场景服务、实时位置、空间查询、标绘、事件记录与回放整合在一起，并通过开放 API 接入任意品牌的第三方设备。">
+        <div class="l-tag">它在这里工作 · SkyAxis</div>
+        <div class="l-body"><span class="l-name">平台层</span>三维场景服务 · 人员 / 车辆实时位置 · 空间查询 · 三维标绘 · 事件记录与回放 · 开放 API（第三方设备接入）</div>
+      </button>
+      <div class="arch-conn"><svg viewBox="0 0 600 46" preserveAspectRatio="none">
+        <line x1="150" y1="0" x2="150" y2="46" stroke="#1B3A5C" stroke-width="1"/>
+        <line x1="450" y1="0" x2="450" y2="46" stroke="#1B3A5C" stroke-width="1"/>
+        <circle class="flow up" cx="150" cy="46" r="3" fill="#3DDC97"/>
+        <circle class="flow down" cx="450" cy="0" r="3" fill="#4FC3F7"/>
+      </svg></div>
+      <button class="layer" data-note="数据不出场站：三维空间模型来自你现有的 CAD、路网与 DEM；实时业务数据来自场站里的人、车、设备与视频流。">
+        <div class="l-tag">数据住在这里</div>
+        <div class="l-body"><span class="l-name">数据层</span>三维空间模型（CAD / 路网 / DEM）· 实时业务数据（人 · 车 · 设备 · 视频）</div>
+      </button>
+    </div>
+    <div class="arch-note">
+      <div class="an-title">这一层做什么</div>
+      <div class="an-body" id="archNote">数据自上而下汇入，指令自下而上呈现——全部在你的园区之内。移到任意一层查看说明。</div>
+      <div class="arch-legend"><span class="dn">●</span> 数据汇入&nbsp;&nbsp;&nbsp;<span class="up">●</span> 指令与呈现</div>
+    </div>
+  </div>
+  <div class="trust-line reveal">
+    <svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8.2-7 9.5-4-1.3-7-5-7-9.5V6l7-3z"/><path d="M9 11.5l2 2 4-4"/></svg>
+    <div>私有化部署，数据不出场站 / 园区边界 · 全链路国产信创兼容（国产 CPU / 操作系统 / 数据库 / GIS）</div>
+  </div>
+</section>
+
+<!-- ============ 04 POC ============ -->
+<section class="block wrap" id="poc">
+  <div class="sec-meta reveal"><div class="sec-num">04</div><div class="sec-line"></div></div>
+  <div class="reveal">
+    <h2>概念验证合作——从一个场站开始</h2>
+    <p class="body-text">我们目前正面向新能源场站和工业园区开放概念验证合作名额。PoC 周期三个月，首批客户提供优惠试点方案。完整过程分四步，点击查看每一步：</p>
+  </div>
+  <div class="reveal">
+    <div class="poc-bar"><div class="poc-fill" id="pocFill"></div></div>
+    <div class="poc-weeks"><span>WEEK 0</span><span>WEEK 4</span><span>WEEK 8</span><span>WEEK 12</span></div>
+    <div class="poc-steps" id="pocSteps">
+      <button class="poc-step active" data-fill="12" data-dur="第 1 周 · 启动"
+        data-desc="了解场站现有设备品牌与系统清单，评估接入方式，明确第一批接入的 2–3 类主体。客户需准备：设备清单、网络拓扑基本信息。">
+        <div class="p-num">STEP 01</div><h3>现场勘察与接入评估</h3>
+      </button>
+      <button class="poc-step" data-fill="33" data-dur="第 1–4 周 · 预计 2–4 周"
+        data-desc="基于场站 CAD / 现有图纸完成三维空间建模，完成私有化平台部署，接通第一批设备数据流。">
+        <div class="p-num">STEP 02</div><h3>场景建模与平台部署</h3>
+      </button>
+      <button class="poc-step" data-fill="83" data-dur="第 4–12 周 · 持续 8–10 周"
+        data-desc="值班主管在实际排班中使用 SkyAxis 进行日常调度。团队跟踪真实使用情况，每月共同复盘。">
+        <div class="p-num">STEP 03</div><h3>值班人员试运行</h3>
+      </button>
+      <button class="poc-step" data-fill="100" data-dur="第 12 周 · 收官"
+        data-desc="PoC 结束时，与您共同评估调度流程与异常响应是否改善。评估结果完全由您决定是否进入正式采购。">
+        <div class="p-num">STEP 04</div><h3>结果评估与后续决策</h3>
+      </button>
+    </div>
+    <div class="poc-detail">
+      <div class="pd-title" id="pdTitle">现场勘察与接入评估</div>
+      <div class="pd-dur" id="pdDur">第 1 周 · 启动</div>
+      <p id="pdDesc">了解场站现有设备品牌与系统清单，评估接入方式，明确第一批接入的 2–3 类主体。客户需准备：设备清单、网络拓扑基本信息。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="footer-in">
+    <div class="trust-text"><strong>天域世界 SkyWorld</strong>，2016 年成立，国家级高新技术企业、专精特新企业。三维 GIS 与物理游戏引擎融合技术已在多个高要求的政府与机构级项目中经过十年工程验证。SkyAxis 是这套技术能力在场景协同调度方向的产品化应用。</div>
+    <div class="cta-col">
+      <a class="cta-btn" href="mailto:mandashang@outlook.com?subject=SkyAxis%20PoC%20%E5%90%88%E4%BD%9C%E5%92%A8%E8%AF%A2">申请试点合作</a>
+      <div class="cta-contact">联系方式 mandashang@outlook.com</div>
+    </div>
+  </div>
+  <div class="doc-footer">
+    <span>SkyAxis 天域枢 · 人机协同监管台 · 交互式解决方案</span>
+    <span>天域世界 SkyWorld · 2026 · v1.0</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+'use strict';
+var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- clocks ---------- */
+function pad(n){return n<10?'0'+n:''+n}
+function tick(){
+  var d=new Date(), s=pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+  document.getElementById('navClock').textContent=s;
+  document.getElementById('hudClock').textContent=s;
+}
+tick(); setInterval(tick,1000);
+
+/* ---------- scroll reveal ---------- */
+var io=new IntersectionObserver(function(es){
+  es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
+
+/* ---------- stat counters ---------- */
+var statIo=new IntersectionObserver(function(es){
+  es.forEach(function(e){
+    if(!e.isIntersecting) return;
+    statIo.unobserve(e.target);
+    var b=e.target, target=+b.dataset.count, t0=null;
+    if(reduced){ b.textContent=target; return; }
+    function step(ts){
+      if(!t0)t0=ts;
+      var p=Math.min((ts-t0)/900,1);
+      b.textContent=Math.round(target*(1-Math.pow(1-p,3)));
+      if(p<1)requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+},{threshold:.6});
+document.querySelectorAll('.stat b').forEach(function(b){statIo.observe(b)});
+
+/* ================= LIVE MAP ================= */
+var SVGNS='http://www.w3.org/2000/svg';
+var entLayer=document.getElementById('entities');
+var tooltip=document.getElementById('tooltip');
+var stage=document.getElementById('mapStage');
+var svg=document.getElementById('siteMap');
+
+function el(tag,attrs){var n=document.createElementNS(SVGNS,tag);for(var k in attrs)n.setAttribute(k,attrs[k]);return n;}
+
+var entities=[
+  {id:'P-01',type:'person',name:'巡检员 · 王',info:'常规巡检 · 光伏 A 区',speed:22,
+   pts:[[100,125],[330,125],[330,185],[100,185]]},
+  {id:'P-02',type:'person',name:'值班员 · 李',info:'升压站例行点检',speed:20,
+   pts:[[880,300],[900,370],[820,340],[770,260],[880,300]]},
+  {id:'P-03',type:'person',name:'巡检员 · 赵',info:'常规巡检 · 光伏 B 区',speed:21,
+   pts:[[110,365],[330,365],[330,425],[110,425]]},
+  {id:'P-04',type:'person',name:'安全员 · 陈',info:'储能区安全巡查',speed:18,
+   pts:[[620,440],[790,440],[790,310],[620,310]]},
+  {id:'V-01',type:'vehicle',name:'维护车 · 皮卡 01',info:'工具运送 · 途中',speed:55,
+   pts:[[440,60],[440,255],[700,255],[940,255],[700,255],[440,255],[440,500],[440,60]]},
+  {id:'V-02',type:'vehicle',name:'消防巡逻车',info:'环线巡逻',speed:48,
+   pts:[[452,500],[452,270],[900,270],[452,270],[452,500]]},
+  {id:'R-01',type:'robot',name:'巡检机器人 A3',info:'红外测温任务 · 电量 82%',speed:14,
+   pts:[[80,100],[350,100],[350,225],[80,225],[80,100]]},
+  {id:'R-02',type:'robot',name:'巡检机器人 B1',info:'表计读数任务 · 电量 64%',speed:13,
+   pts:[[615,335],[790,335],[790,410],[615,410],[615,335]]},
+  {id:'D-01',type:'drone',name:'无人机 SkyEye-1',info:'航线巡检 · 高度 60m',speed:85,
+   pts:[[200,80],[750,110],[820,420],[300,470],[120,300],[200,80]]}
+];
+
+entities.forEach(function(en){
+  var g=el('g',{'class':'ent','data-type':en.type,cursor:'pointer'});
+  var halo=el('circle',{r:14,fill:'transparent'});
+  g.appendChild(halo);
+  if(en.type==='person'){
+    g.appendChild(el('circle',{r:5.5,fill:'#4FC3F7'}));
+    g.appendChild(el('circle',{r:9,fill:'none',stroke:'#4FC3F7','stroke-opacity':'.35','stroke-width':'1'}));
+  }else if(en.type==='vehicle'){
+    g.appendChild(el('rect',{x:-8,y:-5,width:16,height:10,rx:2,fill:'#8AB4F8'}));
+  }else if(en.type==='robot'){
+    g.appendChild(el('rect',{x:-6,y:-6,width:12,height:12,rx:2,fill:'none',stroke:'#4FC3F7','stroke-width':'1.8'}));
+    g.appendChild(el('line',{x1:0,y1:-6,x2:0,y2:-11,stroke:'#4FC3F7','stroke-width':'1.4'}));
+    g.appendChild(el('circle',{cy:-12.5,r:1.6,fill:'#4FC3F7'}));
+  }else{ // drone
+    g.appendChild(el('path',{d:'M-7 -7 L7 7 M7 -7 L-7 7',stroke:'#3DDC97','stroke-width':'2','stroke-linecap':'round'}));
+    g.appendChild(el('circle',{r:3,fill:'#3DDC97'}));
+  }
+  var label=el('text',{y:-16,'text-anchor':'middle','font-size':'9','font-family':"'IBM Plex Mono',monospace",fill:'#5E7F9C','letter-spacing':'1'});
+  label.textContent=en.id;
+  g.appendChild(label);
+  entLayer.appendChild(g);
+  en.g=g; en.seg=0; en.t=Math.random(); en.x=en.pts[0][0]; en.y=en.pts[0][1]; en.mission=null;
+  g.addEventListener('click',function(ev){ev.stopPropagation();showTip(en);});
+});
+
+function segLen(a,b){var dx=b[0]-a[0],dy=b[1]-a[1];return Math.hypot(dx,dy);}
+
+var last=null;
+function frame(ts){
+  if(last===null)last=ts;
+  var dt=Math.min((ts-last)/1000,.05); last=ts;
+  entities.forEach(function(en){
+    if(en.mission){
+      var dx=en.mission.x-en.x, dy=en.mission.y-en.y, d=Math.hypot(dx,dy);
+      var sp=en.speed*2.2;
+      if(d<3){ if(!en.mission.arrived){en.mission.arrived=true; if(en.mission.onArrive)en.mission.onArrive();} }
+      else { en.x+=dx/d*sp*dt; en.y+=dy/d*sp*dt; }
+    } else if(!reduced){
+      var a=en.pts[en.seg], b=en.pts[(en.seg+1)%en.pts.length];
+      var L=segLen(a,b)||1;
+      en.t+=(en.speed*dt)/L;
+      if(en.t>=1){en.t=0;en.seg=(en.seg+1)%en.pts.length;a=en.pts[en.seg];b=en.pts[(en.seg+1)%en.pts.length];}
+      en.x=a[0]+(b[0]-a[0])*en.t;
+      en.y=a[1]+(b[1]-a[1])*en.t;
+    }
+    en.g.setAttribute('transform','translate('+en.x+','+en.y+')');
+  });
+  updateDispatch();
+  if(tipTarget)positionTip(tipTarget);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* layer toggles */
+document.querySelectorAll('.chip[data-layer]').forEach(function(ch){
+  ch.addEventListener('click',function(){
+    var on=ch.dataset.on==='1'?'0':'1';
+    ch.dataset.on=on;
+    var type=ch.dataset.layer, visible=0;
+    entities.forEach(function(en){
+      if(en.type===type)en.g.style.display=(on==='1')?'':'none';
+      if(en.g.style.display!=='none')visible++;
+    });
+    document.getElementById('hudCount').textContent=visible;
+    if(tipTarget && tipTarget.type===type && on==='0')hideTip();
+  });
+});
+
+/* tooltip */
+var tipTarget=null;
+function showTip(en){
+  tipTarget=en;
+  var status=en.mission?'<span style="color:var(--amber)">应急处置中</span>':'<span style="color:var(--green)">执行中 · 正常</span>';
+  tooltip.innerHTML='<h4>'+en.name+'</h4><div>'+en.info+'</div><div class="tt-status">状态：'+status+'</div>';
+  tooltip.classList.add('show');
+  positionTip(en);
+}
+function positionTip(en){
+  var r=svg.getBoundingClientRect();
+  var px=en.x/1000*r.width, py=en.y/560*r.height;
+  var tw=tooltip.offsetWidth, th=tooltip.offsetHeight;
+  var x=px+16, y=py-th-10;
+  if(x+tw>r.width-8)x=px-tw-16;
+  if(y<8)y=py+16;
+  tooltip.style.left=x+'px'; tooltip.style.top=y+'px';
+}
+function hideTip(){tipTarget=null;tooltip.classList.remove('show');}
+stage.addEventListener('click',hideTip);
+
+/* event log */
+var logList=document.getElementById('logList');
+function log(msg,cls){
+  var d=new Date();
+  var item=document.createElement('div');
+  item.className='log-item'+(cls?' '+cls:'');
+  item.innerHTML='<span class="t">'+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())+'</span>'+msg;
+  logList.prepend(item);
+  while(logList.children.length>40)logList.removeChild(logList.lastChild);
+}
+log('SkyAxis 平台已连接 · 9 个主体在图','sys');
+log('常规巡检班次进行中');
+setTimeout(function(){log('R-01 完成 A 区第 3 排红外测温')},2500);
+setTimeout(function(){log('D-01 航线巡检 · 覆盖率 34%')},5200);
+
+/* ambient log noise */
+var ambient=['V-01 抵达升压站西侧 · 卸载工具','P-03 完成 B 区第 2 排点检','R-02 表计读数上传 · 12 条','D-01 航线巡检 · 覆盖率更新','P-04 储能区巡查签到 · 正常','V-02 环线巡逻 · 一切正常'];
+var ai=0;
+setInterval(function(){ if(!drilling){ log(ambient[ai%ambient.length]); ai++; } },9000);
+
+/* ---------- alert drill ---------- */
+var drilling=false;
+var alertG=document.getElementById('alertG');
+var dispatchG=document.getElementById('dispatchLines');
+var hudState=document.getElementById('hudState');
+var drillBtn=document.getElementById('drillBtn');
+var ALERT={x:700,y:160};
+alertG.setAttribute('transform','translate('+ALERT.x+','+ALERT.y+')');
+var ringAnim=null;
+
+var respondents=[];
+function updateDispatch(){
+  if(!drilling){dispatchG.innerHTML='';return;}
+  dispatchG.innerHTML='';
+  respondents.forEach(function(en){
+    if(en.mission&&!en.mission.arrived){
+      var l=el('line',{x1:en.x,y1:en.y,x2:ALERT.x,y2:ALERT.y});
+      dispatchG.appendChild(l);
+    }
+  });
+}
+
+drillBtn.addEventListener('click',function(){
+  if(drilling)return;
+  drilling=true;
+  drillBtn.disabled=true;
+  drillBtn.textContent='演练进行中…';
+  hudState.textContent='异常';
+  hudState.style.color='var(--amber)';
+  alertG.style.transition='opacity .4s';
+  alertG.setAttribute('opacity','1');
+  dispatchG.setAttribute('opacity','.8');
+  if(!reduced){
+    var t0=performance.now();
+    ringAnim=setInterval(function(){
+      var p=((performance.now()-t0)%1600)/1600;
+      document.getElementById('alertRing').setAttribute('r',12+p*30);
+      document.getElementById('alertRing').setAttribute('stroke-opacity',1-p);
+    },40);
+  }
+  log('⚠ 升压站 2# 变压器温度异常报警','warn');
+  var p2=entities.find(function(e){return e.id==='P-02'});
+  var d1=entities.find(function(e){return e.id==='D-01'});
+  var arrivedCount=0;
+  function onArrive(who){
+    return function(){
+      arrivedCount++;
+      log(who+' 抵达异常点 · 开始处置','sys');
+      if(arrivedCount===2){
+        setTimeout(function(){
+          log('现场确认：散热风机故障 · 已隔离','ok');
+          setTimeout(finish,2200);
+        },1600);
+      }
+    };
+  }
+  setTimeout(function(){
+    log('系统就地定位 · 自动匹配最近可用主体','sys');
+    log('派单 → P-02（值班员·李）· D-01（无人机）','sys');
+    p2.mission={x:ALERT.x-24,y:ALERT.y+16,onArrive:onArrive('P-02')};
+    d1.mission={x:ALERT.x+22,y:ALERT.y-14,onArrive:onArrive('D-01')};
+    respondents=[p2,d1];
+  },900);
+
+  function finish(){
+    log('事件关闭 · 全程已自动留痕，可复盘回放','ok');
+    hudState.textContent='正常';
+    hudState.style.color='var(--green)';
+    alertG.setAttribute('opacity','0');
+    dispatchG.setAttribute('opacity','0');
+    if(ringAnim)clearInterval(ringAnim);
+    [p2,d1].forEach(function(en){
+      en.mission=null;
+      // snap back onto nearest waypoint segment start
+      var best=0,bd=1e9;
+      en.pts.forEach(function(pt,i){var d=Math.hypot(pt[0]-en.x,pt[1]-en.y);if(d<bd){bd=d;best=i;}});
+      en.seg=best; en.t=0;
+    });
+    respondents=[];
+    drilling=false;
+    drillBtn.disabled=false;
+    drillBtn.textContent='▶ 演练：触发异常';
+  }
+});
+
+/* ================= merge toggle ================= */
+var mergeStage=document.getElementById('mergeStage');
+var mergeNote=document.getElementById('mergeNote');
+var btnFour=document.getElementById('btnFour'), btnOne=document.getElementById('btnOne');
+function setMode(m){
+  mergeStage.dataset.mode=m;
+  btnFour.setAttribute('aria-pressed',m==='four');
+  btnOne.setAttribute('aria-pressed',m==='one');
+  mergeNote.textContent=(m==='four')
+    ?'FOUR SCREENS · 四套系统，四块屏，归拢信息的还是你'
+    :'ONE MAP · 同一个三维空间坐标系，归拢信息的是 SkyAxis';
+}
+btnFour.addEventListener('click',function(){setMode('four')});
+btnOne.addEventListener('click',function(){setMode('one')});
+
+/* ================= capability cards ================= */
+document.querySelectorAll('.cap').forEach(function(c){
+  c.addEventListener('click',function(){
+    var open=c.getAttribute('aria-expanded')==='true';
+    c.setAttribute('aria-expanded',open?'false':'true');
+  });
+});
+
+/* ================= architecture hover ================= */
+var archBox=document.getElementById('archBox');
+var archNote=document.getElementById('archNote');
+var defaultNote=archNote.textContent;
+document.querySelectorAll('.layer').forEach(function(l){
+  function on(){
+    archBox.classList.add('has-focus');
+    document.querySelectorAll('.layer').forEach(function(x){x.classList.remove('focus')});
+    l.classList.add('focus');
+    archNote.style.opacity=0;
+    setTimeout(function(){archNote.textContent=l.dataset.note;archNote.style.opacity=1;},120);
+  }
+  function off(){
+    archBox.classList.remove('has-focus');
+    l.classList.remove('focus');
+    archNote.style.opacity=0;
+    setTimeout(function(){archNote.textContent=defaultNote;archNote.style.opacity=1;},120);
+  }
+  l.addEventListener('mouseenter',on);
+  l.addEventListener('focus',on);
+  l.addEventListener('mouseleave',off);
+  l.addEventListener('blur',off);
+});
+
+/* flow particles on connectors */
+if(!reduced){
+  var flows=document.querySelectorAll('.arch-conn .flow');
+  var ft=0;
+  setInterval(function(){
+    ft=(ft+0.016)%1;
+    flows.forEach(function(f){
+      var down=f.classList.contains('down');
+      var y=down?ft*46:46-ft*46;
+      f.setAttribute('cy',y);
+      f.setAttribute('opacity',Math.sin(ft*Math.PI));
+    });
+  },40);
+}
+
+/* ================= PoC stepper ================= */
+var steps=document.querySelectorAll('.poc-step');
+var pocFill=document.getElementById('pocFill');
+var pdTitle=document.getElementById('pdTitle'),pdDur=document.getElementById('pdDur'),pdDesc=document.getElementById('pdDesc');
+function activateStep(s){
+  steps.forEach(function(x){x.classList.remove('active')});
+  s.classList.add('active');
+  pocFill.style.width=s.dataset.fill+'%';
+  pdTitle.textContent=s.querySelector('h3').textContent;
+  pdDur.textContent=s.dataset.dur;
+  pdDesc.textContent=s.dataset.desc;
+}
+steps.forEach(function(s){s.addEventListener('click',function(){activateStep(s)})});
+/* animate bar in when visible */
+var pocIo=new IntersectionObserver(function(es){
+  es.forEach(function(e){ if(e.isIntersecting){ pocFill.style.width='12%'; pocIo.unobserve(e.target);} });
+},{threshold:.4});
+pocIo.observe(pocFill.parentElement);
+
+})();
+</script>
+</body>
+</html>
