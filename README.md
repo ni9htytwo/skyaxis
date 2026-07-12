@@ -1,10 +1,19 @@
 # SkyAxis 天域枢 · 解决方案说明书
-Interactive solution brief for SkyAxis — a human-machine collaborative ops platform for energy/industrial sites. Single-file HTML demo with a live site-map simulation. 
-人机协同监管台 **SkyAxis 天域枢** 的产品说明页 —— 一个纯前端、单文件的交互式信息图，用来向新能源场站 / 工业园区的值班主管介绍"人员、车辆、机器人、无人机同一张图"的调度理念。
+
+人机协同监管台 **SkyAxis 天域枢** 的产品说明页 —— 纯前端、零依赖的交互式页面，用来向新能源场站 / 工业园区的值班主管介绍"人员、车辆、机器人、无人机同一张图"的调度理念。
 
 🔗 **在线预览**： `https://ni9htytwo.github.io/skyaxis/`
 
-## 页面包含什么
+## 项目包含两个页面
+
+| 文件                       | 说明                                  |
+| -------------------------- | ------------------------------------- |
+| `index.html`               | 交互式解决方案信息图（主页面）        |
+| `SkyAxis-ProductDemo.html` | 产品 Demo —— 新能源场站值班台实景模拟 |
+
+主页面的导航栏、首屏区域和底部均提供跳转按钮，可直接进入产品 Demo 页面。
+
+## 主页面包含什么
 
 - **实时态势模拟地图**：人员、车辆、巡检机器人、无人机在同一张场站地图上移动，可点击查看状态、按图层筛选，并有一键"触发异常"演练，模拟报警 → 就地派单 → 处置 → 复盘的全流程
 - **为什么现有工具解决不了**：SCADA / 安防 / 飞控三套系统各自为政的问题，附"四块屏 vs 一张图"的可切换对比演示
@@ -23,21 +32,24 @@ Interactive solution brief for SkyAxis — a human-machine collaborative ops pla
 
 ```bash
 # 克隆仓库后
-open index.html        # macOS
+open index.html        # macOS 主页面
+open SkyAxis-ProductDemo.html   # 产品 Demo
 # 或双击文件 / 拖进浏览器
 ```
 
 ## 部署到 GitHub Pages
 
-1. 把 HTML 文件重命名为 `index.html`，放在仓库根目录（或 `/docs` 目录）
+1. 将 `index.html` 和 `SkyAxis-ProductDemo.html` 放在仓库根目录（或 `/docs` 目录）
 2. 仓库 Settings → Pages → Source 选择对应分支和目录 → Save
 3. 稍等片刻，GitHub 会给出访问链接（通常是 `https://<用户名>.github.io/<仓库名>/`）
+4. 两个页面之间的跳转链接使用相对路径，部署后自动生效
 
 ## 目录结构
 
 ```
 .
-└── index.html   # 页面全部内容（结构 / 样式 / 脚本）都在这一个文件里
+├── index.html                    # 主页面：交互式解决方案信息图
+└── SkyAxis-ProductDemo.html      # 产品 Demo：新能源场站值班台实景模拟
 ```
 
 ## 说明
@@ -47,4 +59,3 @@ open index.html        # macOS
 ---
 
 天域世界 SkyWorld · SkyAxis 天域枢
-
